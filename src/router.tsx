@@ -8,13 +8,17 @@ import { CategoriesSettingsPage } from '@/features/categories/CategoriesSettings
 import { FamilyMembersSettingsPage } from '@/features/family-members/FamilyMembersSettingsPage'
 import { RecurringTemplatesPage } from '@/features/recurring-templates/RecurringTemplatesPage'
 import { currentMonthKey } from '@/lib/month'
+import { getLastViewedMonth } from '@/lib/lastViewedMonth'
 
 export function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<Navigate to={`/monthly/${currentMonthKey()}`} replace />} />
+        <Route
+          path="/"
+          element={<Navigate to={`/monthly/${getLastViewedMonth() ?? currentMonthKey()}`} replace />}
+        />
         <Route path="/monthly/:month" element={<MonthlyReviewPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/savings-goals" element={<SavingsGoalsPage />} />

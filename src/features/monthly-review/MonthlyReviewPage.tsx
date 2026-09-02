@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { currentMonthKey } from '@/lib/month'
+import { setLastViewedMonth } from '@/lib/lastViewedMonth'
 import { useBudgetLines } from './hooks/useBudgetLines'
 import { useMonth } from './hooks/useMonth'
 import { computeSavingsTotals, computeTotals, groupByCategory } from './utils'
@@ -20,6 +21,10 @@ import { useMonthlySavingsContributions, useSavingsGoals } from '@/features/savi
 export function MonthlyReviewPage() {
   const params = useParams<{ month: string }>()
   const monthKey = params.month ?? currentMonthKey()
+
+  useEffect(() => {
+    setLastViewedMonth(monthKey)
+  }, [monthKey])
 
   const { data: rows = [], isLoading } = useBudgetLines(monthKey)
   const { data: month } = useMonth(monthKey)
