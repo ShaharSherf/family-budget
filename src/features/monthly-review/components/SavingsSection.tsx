@@ -104,7 +104,7 @@ export function SavingsSection({ monthKey, readOnly }: { monthKey: string; readO
   const targetTotal = activeGoals.reduce((sum, g) => sum + (g.monthly_target_amount ?? 0), 0)
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-800">
       <table className="w-full text-start">
         <thead>
           <tr>

@@ -30,7 +30,7 @@ export function MonthlyTable({
 
   return (
     <div>
-      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-800">
         <table className="w-full text-start">
           <thead>
             <tr>
