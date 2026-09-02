@@ -204,6 +204,7 @@ export interface Database {
           name: string
           monthly_target_amount: number | null
           lifetime_target_amount: number | null
+          opening_balance_amount: number
           is_active: boolean
           notes: string | null
           created_at: string
@@ -214,6 +215,7 @@ export interface Database {
           name: string
           monthly_target_amount?: number | null
           lifetime_target_amount?: number | null
+          opening_balance_amount?: number
           is_active?: boolean
           notes?: string | null
           created_at?: string

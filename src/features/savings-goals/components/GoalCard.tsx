@@ -27,6 +27,7 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
   const [name, setName] = useState(goal.name)
   const [monthlyTarget, setMonthlyTarget] = useState(goal.monthly_target_amount?.toString() ?? '')
   const [lifetimeTarget, setLifetimeTarget] = useState(goal.lifetime_target_amount?.toString() ?? '')
+  const [openingBalance, setOpeningBalance] = useState(goal.opening_balance_amount.toString())
 
   const commitName = useDebouncedCallback((value: string) => {
     if (!value.trim() || value === goal.name) return
@@ -45,12 +46,19 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
     updateGoal.mutate({ id: goal.id, patch: { lifetime_target_amount: n } })
   }, 500)
 
+  const commitOpeningBalance = useDebouncedCallback((value: string) => {
+    const n = Number(value)
+    if (!Number.isFinite(n) || n < 0) return
+    updateGoal.mutate({ id: goal.id, patch: { opening_balance_amount: n } })
+  }, 500)
+
   const currentMonthDate = toMonthDate(currentMonthKey())
   const thisMonth = balances.find((b) => b.month_key === currentMonthDate)
   const thisMonthContribution = thisMonth?.contributed_amount ?? 0
 
   const latest = balances[balances.length - 1]
-  const cumulativeBalance = latest?.cumulative_balance ?? 0
+  // A goal with no contributions yet still has its opening balance.
+  const cumulativeBalance = latest?.cumulative_balance ?? goal.opening_balance_amount
   const remainingToGoal =
     goal.lifetime_target_amount !== null ? goal.lifetime_target_amount - cumulativeBalance : null
 
@@ -93,6 +101,19 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
           </span>
         </div>
         <ProgressBar value={thisMonthContribution} max={goal.monthly_target_amount} />
+      </div>
+
+      <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+        <span>יתרת פתיחה (לפני שהתחלנו לעקוב)</span>
+        <NumberInput
+          className="w-24"
+          placeholder="יתרת פתיחה"
+          value={openingBalance}
+          onChange={(e) => {
+            setOpeningBalance(e.target.value)
+            commitOpeningBalance(e.target.value)
+          }}
+        />
       </div>
 
       <div className="mt-3 flex flex-col gap-1">
