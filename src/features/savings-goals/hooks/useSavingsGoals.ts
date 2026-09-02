@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createSavingsGoal,
-  getAllSavingsGoalBalances,
+  getAllContributions,
+  getContributionsForGoal,
   getContributionsForMonth,
   getSavingsGoals,
   updateSavingsGoal,
+  upsertActualBalance,
   upsertContribution,
 } from '@/lib/supabase/queries/savingsGoals'
 import { queryKeys } from '@/lib/queryClient'
@@ -14,8 +16,12 @@ export function useSavingsGoals() {
   return useQuery({ queryKey: queryKeys.savingsGoals, queryFn: getSavingsGoals })
 }
 
-export function useAllSavingsGoalBalances() {
-  return useQuery({ queryKey: queryKeys.savingsGoalBalances, queryFn: getAllSavingsGoalBalances })
+export function useAllContributions() {
+  return useQuery({ queryKey: queryKeys.allSavingsContributions, queryFn: getAllContributions })
+}
+
+export function useContributionsForGoal(goalId: string) {
+  return useQuery({ queryKey: queryKeys.goalContributions(goalId), queryFn: () => getContributionsForGoal(goalId) })
 }
 
 export function useMonthlySavingsContributions(monthKey: string) {
@@ -48,8 +54,18 @@ export function useUpsertContribution() {
     mutationFn: (vars: { goalId: string; monthKey: string; contributedAmount: number; notes?: string }) =>
       upsertContribution(vars.goalId, vars.monthKey, vars.contributedAmount, vars.notes),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalBalances })
-      queryClient.invalidateQueries({ queryKey: ['savingsContributions'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.allSavingsContributions })
+    },
+  })
+}
+
+export function useUpsertActualBalance() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: { goalId: string; monthKey: string; actualBalanceAmount: number | null }) =>
+      upsertActualBalance(vars.goalId, vars.monthKey, vars.actualBalanceAmount),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.allSavingsContributions })
     },
   })
 }

@@ -1,6 +1,6 @@
 import { useCategoryActualsRange, useMonthKpisRange, useMonthRange, usePersonSpendingRange } from './hooks/useAnalyticsData'
 import { useFamilyMembers } from '@/features/family-members/useFamilyMembers'
-import { useAllSavingsGoalBalances, useSavingsGoals } from '@/features/savings-goals/hooks/useSavingsGoals'
+import { useAllContributions, useSavingsGoals } from '@/features/savings-goals/hooks/useSavingsGoals'
 import { ChartCard } from '@/components/charts/ChartCard'
 import { IncomeExpenseNetChart } from './components/IncomeExpenseNetChart'
 import { CategoryTrendChart } from './components/CategoryTrendChart'
@@ -16,7 +16,7 @@ export function AnalyticsPage() {
   const { data: personSpending = [], isLoading: personLoading } = usePersonSpendingRange(range?.from, range?.to)
   const { data: familyMembers = [] } = useFamilyMembers()
   const { data: goals = [] } = useSavingsGoals()
-  const { data: goalBalances = [] } = useAllSavingsGoalBalances()
+  const { data: goalContributions = [] } = useAllContributions()
 
   return (
     <div className="flex flex-col gap-4">
@@ -34,7 +34,7 @@ export function AnalyticsPage() {
         </ChartCard>
 
         <ChartCard title="התקדמות יעדי חיסכון" isEmpty={goals.length === 0}>
-          <GoalProgressChart goals={goals} balances={goalBalances} />
+          <GoalProgressChart goals={goals} contributions={goalContributions} />
         </ChartCard>
 
         <ChartCard title="הוצאות לפי בן משפחה" isLoading={personLoading} isEmpty={personSpending.length === 0}>

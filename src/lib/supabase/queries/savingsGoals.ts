@@ -1,9 +1,9 @@
 import { supabase } from '@/lib/supabase/client'
 import { toMonthDate } from '@/lib/month'
-import type { Tables, TablesInsert, TablesUpdate, ViewRow } from '@/lib/supabase/database.types'
+import type { Tables, TablesInsert, TablesUpdate } from '@/lib/supabase/database.types'
 
 export type SavingsGoal = Tables<'savings_goals'>
-export type SavingsGoalBalance = ViewRow<'savings_goal_balances'>
+export type SavingsContribution = Tables<'savings_contributions'>
 
 export async function getSavingsGoals(): Promise<SavingsGoal[]> {
   const { data, error } = await supabase.from('savings_goals').select('*').order('name', { ascending: true })
@@ -23,26 +23,26 @@ export async function updateSavingsGoal(id: string, patch: TablesUpdate<'savings
   return data
 }
 
-export async function getSavingsGoalBalances(goalId: string): Promise<SavingsGoalBalance[]> {
+export async function getContributionsForGoal(goalId: string): Promise<SavingsContribution[]> {
   const { data, error } = await supabase
-    .from('savings_goal_balances')
+    .from('savings_contributions')
     .select('*')
     .eq('goal_id', goalId)
     .order('month_key', { ascending: true })
   if (error) throw error
-  return data as unknown as SavingsGoalBalance[]
+  return data
 }
 
-export async function getAllSavingsGoalBalances(): Promise<SavingsGoalBalance[]> {
+export async function getAllContributions(): Promise<SavingsContribution[]> {
   const { data, error } = await supabase
-    .from('savings_goal_balances')
+    .from('savings_contributions')
     .select('*')
     .order('month_key', { ascending: true })
   if (error) throw error
-  return data as unknown as SavingsGoalBalance[]
+  return data
 }
 
-export async function getContributionsForMonth(monthKey: string): Promise<Tables<'savings_contributions'>[]> {
+export async function getContributionsForMonth(monthKey: string): Promise<SavingsContribution[]> {
   const { data, error } = await supabase
     .from('savings_contributions')
     .select('*')
@@ -51,6 +51,7 @@ export async function getContributionsForMonth(monthKey: string): Promise<Tables
   return data
 }
 
+/** Only touches contributed_amount — leaves that month's actual_balance_amount (if any) untouched. */
 export async function upsertContribution(
   goalId: string,
   monthKey: string,
@@ -61,6 +62,21 @@ export async function upsertContribution(
     .from('savings_contributions')
     .upsert(
       { goal_id: goalId, month_key: toMonthDate(monthKey), contributed_amount: contributedAmount, notes },
+      { onConflict: 'goal_id,month_key' },
+    )
+  if (error) throw error
+}
+
+/** Only touches actual_balance_amount — leaves that month's contributed_amount (if any) untouched. */
+export async function upsertActualBalance(
+  goalId: string,
+  monthKey: string,
+  actualBalanceAmount: number | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from('savings_contributions')
+    .upsert(
+      { goal_id: goalId, month_key: toMonthDate(monthKey), actual_balance_amount: actualBalanceAmount },
       { onConflict: 'goal_id,month_key' },
     )
   if (error) throw error

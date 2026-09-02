@@ -3,22 +3,33 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { categorical, chrome, formatAxisILS } from '@/components/charts/chartTheme'
 import { formatMonthLabel } from '@/lib/format'
 import { fromMonthDate } from '@/lib/month'
-import type { SavingsGoal, SavingsGoalBalance } from '@/lib/supabase/queries/savingsGoals'
+import { computeGoalMonthBalances } from '@/features/savings-goals/utils'
+import type { SavingsContribution, SavingsGoal } from '@/lib/supabase/queries/savingsGoals'
 
-export function GoalProgressChart({ goals, balances }: { goals: SavingsGoal[]; balances: SavingsGoalBalance[] }) {
-  const goalNameById = useMemo(() => new Map(goals.map((g) => [g.id, g.name])), [goals])
-
+export function GoalProgressChart({
+  goals,
+  contributions,
+}: {
+  goals: SavingsGoal[]
+  contributions: SavingsContribution[]
+}) {
   const chartData = useMemo(() => {
+    // Keyed by the sortable "YYYY-MM" monthKey, not the Hebrew label — labels
+    // don't sort chronologically, so formatting happens only at the end.
     const byMonth = new Map<string, Record<string, number>>()
-    for (const balance of balances) {
-      const monthLabel = formatMonthLabel(fromMonthDate(balance.month_key))
-      const bucket = byMonth.get(monthLabel) ?? {}
-      const goalName = goalNameById.get(balance.goal_id) ?? balance.goal_id
-      bucket[goalName] = balance.cumulative_balance
-      byMonth.set(monthLabel, bucket)
+    for (const goal of goals) {
+      const goalContributions = contributions.filter((c) => c.goal_id === goal.id)
+      const monthBalances = computeGoalMonthBalances(goal.opening_balance_amount, goalContributions)
+      for (const balance of monthBalances) {
+        const bucket = byMonth.get(balance.monthKey) ?? {}
+        bucket[goal.name] = balance.cumulativeBalance
+        byMonth.set(balance.monthKey, bucket)
+      }
     }
-    return [...byMonth.entries()].map(([month, values]) => ({ month, ...values }))
-  }, [balances, goalNameById])
+    return [...byMonth.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([monthKey, values]) => ({ month: formatMonthLabel(fromMonthDate(monthKey)), ...values }))
+  }, [goals, contributions])
 
   return (
     <div dir="ltr" className="h-72 w-full">

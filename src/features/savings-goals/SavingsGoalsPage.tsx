@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { useAllSavingsGoalBalances, useCreateSavingsGoal, useSavingsGoals } from './hooks/useSavingsGoals'
+import { useAllContributions, useCreateSavingsGoal, useSavingsGoals } from './hooks/useSavingsGoals'
 import { GoalCard } from './components/GoalCard'
 import { Input, NumberInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
 export function SavingsGoalsPage() {
   const { data: goals = [] } = useSavingsGoals()
-  const { data: balances = [] } = useAllSavingsGoalBalances()
+  const { data: contributions = [] } = useAllContributions()
   const create = useCreateSavingsGoal()
 
   const [name, setName] = useState('')
@@ -19,7 +19,7 @@ export function SavingsGoalsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {goals.map((goal) => (
-          <GoalCard key={goal.id} goal={goal} balances={balances.filter((b) => b.goal_id === goal.id)} />
+          <GoalCard key={goal.id} goal={goal} contributions={contributions.filter((c) => c.goal_id === goal.id)} />
         ))}
       </div>
 

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { cn } from '@/lib/cn'
 import { formatILS, formatMonthLabel } from '@/lib/format'
 import { currentMonthKey, fromMonthDate, toMonthDate } from '@/lib/month'
 import { chrome } from '@/components/charts/chartTheme'
@@ -8,7 +9,8 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { ContributionForm } from './ContributionForm'
 import { useUpdateSavingsGoal } from '../hooks/useSavingsGoals'
-import type { SavingsGoal, SavingsGoalBalance } from '@/lib/supabase/queries/savingsGoals'
+import { computeGoalMonthBalances } from '../utils'
+import type { SavingsGoal, SavingsContribution } from '@/lib/supabase/queries/savingsGoals'
 
 function ProgressBar({ value, max }: { value: number; max: number | null }) {
   const pct = max && max > 0 ? Math.min(100, (value / max) * 100) : 0
@@ -22,7 +24,7 @@ function ProgressBar({ value, max }: { value: number; max: number | null }) {
   )
 }
 
-export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: SavingsGoalBalance[] }) {
+export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contributions: SavingsContribution[] }) {
   const updateGoal = useUpdateSavingsGoal()
   const [name, setName] = useState(goal.name)
   const [monthlyTarget, setMonthlyTarget] = useState(goal.monthly_target_amount?.toString() ?? '')
@@ -52,17 +54,22 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
     updateGoal.mutate({ id: goal.id, patch: { opening_balance_amount: n } })
   }, 500)
 
-  const currentMonthDate = toMonthDate(currentMonthKey())
-  const thisMonth = balances.find((b) => b.month_key === currentMonthDate)
-  const thisMonthContribution = thisMonth?.contributed_amount ?? 0
+  const monthBalances = useMemo(
+    () => computeGoalMonthBalances(goal.opening_balance_amount, contributions),
+    [goal.opening_balance_amount, contributions],
+  )
 
-  const latest = balances[balances.length - 1]
+  const currentMonthDate = toMonthDate(currentMonthKey())
+  const thisMonth = monthBalances.find((b) => b.monthKey === currentMonthDate)
+  const thisMonthContribution = thisMonth?.contributedAmount ?? 0
+
+  const latest = monthBalances[monthBalances.length - 1]
   // A goal with no contributions yet still has its opening balance.
-  const cumulativeBalance = latest?.cumulative_balance ?? goal.opening_balance_amount
+  const cumulativeBalance = latest?.cumulativeBalance ?? goal.opening_balance_amount
   const remainingToGoal =
     goal.lifetime_target_amount !== null ? goal.lifetime_target_amount - cumulativeBalance : null
 
-  const history = [...balances].reverse()
+  const history = [...monthBalances].reverse()
 
   return (
     <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
@@ -150,12 +157,34 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
         <details className="mt-3">
           <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">היסטוריה חודשית</summary>
           <table className="mt-2 w-full text-xs">
+            <thead>
+              <tr className="text-gray-400 dark:text-gray-500">
+                <th className="py-1 text-start">חודש</th>
+                <th className="py-1 text-start">הפקדה</th>
+                <th className="py-1 text-start">תשואת שוק</th>
+                <th className="py-1 text-start">יתרה</th>
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {history.map((b) => (
-                <tr key={b.month_key}>
-                  <td className="py-1 text-gray-500 dark:text-gray-400">{formatMonthLabel(fromMonthDate(b.month_key))}</td>
-                  <td className="py-1 text-gray-700 dark:text-gray-300">{formatILS(b.contributed_amount)}</td>
-                  <td className="py-1 text-gray-400 dark:text-gray-500">{formatILS(b.cumulative_balance)}</td>
+                <tr key={b.monthKey}>
+                  <td className="py-1 text-gray-500 dark:text-gray-400">{formatMonthLabel(fromMonthDate(b.monthKey))}</td>
+                  <td className="py-1 text-gray-700 dark:text-gray-300">{formatILS(b.contributedAmount)}</td>
+                  <td
+                    className={cn(
+                      'py-1',
+                      b.marketReturnAmount === null
+                        ? 'text-gray-400 dark:text-gray-500'
+                        : b.marketReturnAmount > 0
+                          ? 'text-green-600 dark:text-green-400'
+                          : b.marketReturnAmount < 0
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-gray-500 dark:text-gray-400',
+                    )}
+                  >
+                    {b.marketReturnAmount === null ? 'לא ידוע' : formatILS(b.marketReturnAmount)}
+                  </td>
+                  <td className="py-1 text-gray-400 dark:text-gray-500">{formatILS(b.cumulativeBalance)}</td>
                 </tr>
               ))}
             </tbody>

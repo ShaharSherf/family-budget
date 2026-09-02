@@ -230,6 +230,7 @@ export interface Database {
           goal_id: string
           month_key: string
           contributed_amount: number
+          actual_balance_amount: number | null
           notes: string | null
           created_at: string
         }
@@ -238,6 +239,7 @@ export interface Database {
           goal_id: string
           month_key: string
           contributed_amount?: number
+          actual_balance_amount?: number | null
           notes?: string | null
           created_at?: string
         }
@@ -271,15 +273,6 @@ export interface Database {
           expense_actual: number
           expense_target: number
           leftover_actual: number
-        }
-        Relationships: []
-      }
-      savings_goal_balances: {
-        Row: {
-          goal_id: string
-          month_key: string
-          contributed_amount: number
-          cumulative_balance: number
         }
         Relationships: []
       }
