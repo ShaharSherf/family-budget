@@ -8,6 +8,7 @@ import { MonthPicker } from './components/MonthPicker'
 import { BudgetActualSummary } from './components/BudgetActualSummary'
 import { CloseMonthToggle } from './components/CloseMonthToggle'
 import { MonthlyTable } from './components/MonthlyTable'
+import { SavingsSection } from './components/SavingsSection'
 import { ChartCard } from '@/components/charts/ChartCard'
 import { BudgetVsActualBarChart } from '@/components/charts/BudgetVsActualBarChart'
 import { CategoryBreakdownPieChart } from '@/components/charts/CategoryBreakdownPieChart'
@@ -49,7 +50,10 @@ export function MonthlyReviewPage() {
       {isLoading ? (
         <p className="text-sm text-gray-400">טוען...</p>
       ) : (
-        <MonthlyTable groups={groups} monthKey={monthKey} readOnly={readOnly} />
+        <>
+          <MonthlyTable groups={groups} monthKey={monthKey} readOnly={readOnly} />
+          <SavingsSection monthKey={monthKey} readOnly={readOnly} />
+        </>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">

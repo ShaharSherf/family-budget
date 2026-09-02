@@ -1,6 +1,13 @@
-import { formatILS } from '@/lib/format'
+import { useState } from 'react'
+import { formatILS, formatMonthLabel } from '@/lib/format'
+import { currentMonthKey, fromMonthDate, toMonthDate } from '@/lib/month'
 import { chrome } from '@/components/charts/chartTheme'
+import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
+import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { ContributionForm } from './ContributionForm'
+import { useUpdateSavingsGoal } from '../hooks/useSavingsGoals'
 import type { SavingsGoal, SavingsGoalBalance } from '@/lib/supabase/queries/savingsGoals'
 
 function ProgressBar({ value, max }: { value: number; max: number | null }) {
@@ -16,13 +23,44 @@ function ProgressBar({ value, max }: { value: number; max: number | null }) {
 }
 
 export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: SavingsGoalBalance[] }) {
+  const updateGoal = useUpdateSavingsGoal()
+  const [name, setName] = useState(goal.name)
+
+  const commitName = useDebouncedCallback((value: string) => {
+    if (!value.trim() || value === goal.name) return
+    updateGoal.mutate({ id: goal.id, patch: { name: value.trim() } })
+  }, 500)
+
+  const currentMonthDate = toMonthDate(currentMonthKey())
+  const thisMonth = balances.find((b) => b.month_key === currentMonthDate)
+  const thisMonthContribution = thisMonth?.contributed_amount ?? 0
+
   const latest = balances[balances.length - 1]
   const cumulativeBalance = latest?.cumulative_balance ?? 0
-  const thisMonthContribution = balances[balances.length - 1]?.contributed_amount ?? 0
+  const remainingToGoal =
+    goal.lifetime_target_amount !== null ? goal.lifetime_target_amount - cumulativeBalance : null
+
+  const history = [...balances].reverse()
 
   return (
     <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
-      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{goal.name}</h3>
+      <div className="flex items-center gap-2">
+        <Input
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value)
+            commitName(e.target.value)
+          }}
+          className="font-semibold"
+        />
+        {!goal.is_active && <Badge tone="warning">לא פעיל</Badge>}
+        <Button
+          variant="ghost"
+          onClick={() => updateGoal.mutate({ id: goal.id, patch: { is_active: !goal.is_active } })}
+        >
+          {goal.is_active ? 'השבתה' : 'הפעלה'}
+        </Button>
+      </div>
 
       <div className="mt-3 flex flex-col gap-1">
         <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -42,6 +80,11 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
           </span>
         </div>
         <ProgressBar value={cumulativeBalance} max={goal.lifetime_target_amount} />
+        {remainingToGoal !== null && (
+          <div className="text-xs text-gray-400 dark:text-gray-500">
+            {remainingToGoal <= 0 ? 'היעד הושג! 🎉' : `נותר להשלמת היעד: ${formatILS(remainingToGoal)}`}
+          </div>
+        )}
       </div>
 
       {goal.notes && <p className="mt-2 text-xs text-gray-400">{goal.notes}</p>}
@@ -49,6 +92,23 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
       <div className="mt-3">
         <ContributionForm goalId={goal.id} />
       </div>
+
+      {history.length > 0 && (
+        <details className="mt-3">
+          <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">היסטוריה חודשית</summary>
+          <table className="mt-2 w-full text-xs">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {history.map((b) => (
+                <tr key={b.month_key}>
+                  <td className="py-1 text-gray-500 dark:text-gray-400">{formatMonthLabel(fromMonthDate(b.month_key))}</td>
+                  <td className="py-1 text-gray-700 dark:text-gray-300">{formatILS(b.contributed_amount)}</td>
+                  <td className="py-1 text-gray-400 dark:text-gray-500">{formatILS(b.cumulative_balance)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
+      )}
     </div>
   )
 }

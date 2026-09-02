@@ -5,9 +5,9 @@ import type { MonthTotals, SavingsTotals } from '../utils'
 type TileMode =
   /** Neutral — never colored (e.g. a plain figure with no good/bad direction). */
   | 'neutral'
-  /** Exceeding target is bad — expenses. */
-  | 'expense'
-  /** At/above target is good (green), below is bad (red) — income, savings. */
+  /** Above target is good (green), below is bad (red), equal is neutral — spending less than planned. */
+  | 'belowTargetGood'
+  /** At/above target is good (green), below is bad (red), equal is neutral — income, savings. */
   | 'aboveTargetGood'
   /** Negative is bad (red), non-negative is neutral. */
   | 'net'
@@ -26,9 +26,9 @@ function Tile({
   const isOverTarget = target !== undefined && target > 0 && actual > target
   const isUnderTarget = target !== undefined && target > 0 && actual < target
 
-  const isGood = mode === 'aboveTargetGood' && isOverTarget
+  const isGood = (mode === 'aboveTargetGood' && isOverTarget) || (mode === 'belowTargetGood' && isUnderTarget)
   const isWarning =
-    (mode === 'expense' && isOverTarget) ||
+    (mode === 'belowTargetGood' && isOverTarget) ||
     (mode === 'aboveTargetGood' && isUnderTarget) ||
     (mode === 'net' && actual < 0)
 
@@ -55,6 +55,10 @@ function Tile({
 }
 
 export function BudgetActualSummary({ totals, savings }: { totals: MonthTotals; savings: SavingsTotals }) {
+  // "Left over" accounts for money already committed to savings this month —
+  // it's what's left after both expenses AND savings contributions.
+  const netLeftover = totals.leftoverActual - savings.actual
+
   return (
     <div className="flex flex-wrap gap-3">
       <Tile
@@ -63,9 +67,14 @@ export function BudgetActualSummary({ totals, savings }: { totals: MonthTotals; 
         target={totals.incomeTarget}
         mode="aboveTargetGood"
       />
-      <Tile label="הוצאות בפועל" actual={totals.expenseActual} target={totals.expenseTarget} mode="expense" />
+      <Tile
+        label="הוצאות בפועל"
+        actual={totals.expenseActual}
+        target={totals.expenseTarget}
+        mode="belowTargetGood"
+      />
       <Tile label="חיסכון החודש" actual={savings.actual} target={savings.target} mode="aboveTargetGood" />
-      <Tile label="נותר בסוף החודש" actual={totals.leftoverActual} mode="net" />
+      <Tile label="נותר בסוף החודש" actual={netLeftover} mode="net" />
     </div>
   )
 }

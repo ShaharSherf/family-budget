@@ -42,7 +42,10 @@ export function MonthlyTableRow({
 
   const remainingDisplay = remaining === null ? null : isIncome ? Math.abs(incomeDiff!) : remaining
   const remainingIsWarning = remaining !== null && (isIncome ? incomeDiff! < 0 : remaining < 0)
-  const remainingIsGood = isIncome && incomeDiff !== null && incomeDiff >= 0
+  // Income: earning more than planned is good. Expenses: spending less than
+  // budgeted (a positive remaining balance) is good; spending exactly the
+  // budget is neutral, not a "win".
+  const remainingIsGood = remaining !== null && (isIncome ? incomeDiff! > 0 : remaining > 0)
 
   return (
     <tr className={row.needs_review ? 'bg-amber-50 dark:bg-amber-950/30' : undefined}>
