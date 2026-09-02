@@ -106,10 +106,13 @@ export function SavingsSection({ monthKey, readOnly }: { monthKey: string; readO
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
       <table className="w-full text-start">
-        <thead className="bg-gray-50 dark:bg-gray-900">
+        <thead>
           <tr>
             {HEADERS.map((h) => (
-              <th key={h} className="px-2 py-1.5 text-start text-xs font-medium text-gray-500 dark:text-gray-400">
+              <th
+                key={h}
+                className="sticky top-[57px] z-[5] bg-gray-50 px-2 py-1.5 text-start text-xs font-medium text-gray-500 dark:bg-gray-900 dark:text-gray-400"
+              >
                 {h}
               </th>
             ))}
