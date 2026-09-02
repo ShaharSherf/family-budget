@@ -31,13 +31,18 @@ export function MonthlyTableRow({
     update.mutate({ id: row.id, patch: { ...patch, needs_review: false, is_template_override: row.template_id ? true : row.is_template_override } })
   }, 400)
 
-  const remaining =
-    row.target_amount !== null && row.family_actual_amount !== null
-      ? row.target_amount - row.family_actual_amount
-      : null
-  // Negative "remaining" only means trouble for expenses (over budget) — for
-  // income it means the family earned more than planned, which is good news.
-  const remainingIsWarning = remaining !== null && remaining < 0 && row.category.kind === 'expense'
+  const hasComparison = row.target_amount !== null && row.family_actual_amount !== null
+  const isIncome = row.category.kind === 'income'
+
+  // Expenses: "remaining budget" (target - actual), red when over budget (negative).
+  // Income: shown as a plain surplus/shortfall magnitude — never a signed negative
+  // number, since "earned more than planned" is good news, not a deficit.
+  const remaining = hasComparison ? row.target_amount! - row.family_actual_amount! : null
+  const incomeDiff = hasComparison ? row.family_actual_amount! - row.target_amount! : null
+
+  const remainingDisplay = remaining === null ? null : isIncome ? Math.abs(incomeDiff!) : remaining
+  const remainingIsWarning = remaining !== null && (isIncome ? incomeDiff! < 0 : remaining < 0)
+  const remainingIsGood = isIncome && incomeDiff !== null && incomeDiff >= 0
 
   return (
     <tr className={row.needs_review ? 'bg-amber-50 dark:bg-amber-950/30' : undefined}>
@@ -93,10 +98,12 @@ export function MonthlyTableRow({
         className={
           remainingIsWarning
             ? 'px-2 py-1.5 text-sm font-medium text-red-600 dark:text-red-400'
-            : 'px-2 py-1.5 text-sm text-gray-500 dark:text-gray-400'
+            : remainingIsGood
+              ? 'px-2 py-1.5 text-sm font-medium text-green-600 dark:text-green-400'
+              : 'px-2 py-1.5 text-sm text-gray-500 dark:text-gray-400'
         }
       >
-        {remaining !== null ? formatILS(remaining) : '—'}
+        {remainingDisplay !== null ? formatILS(remainingDisplay) : '—'}
       </td>
       <td className="px-2 py-1.5">
         <WhoPaidCell budgetLineId={row.id} payments={row.payments} monthKey={monthKey} readOnly={readOnly} />

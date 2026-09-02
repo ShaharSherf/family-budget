@@ -46,7 +46,10 @@ export function MonthlyReviewPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <ChartCard title="תקציב מול הוצאה בפועל" isEmpty={categoryActuals.length === 0}>
+        <ChartCard
+          title="תקציב מול הוצאה בפועל"
+          isEmpty={categoryActuals.every((r) => r.kind !== 'expense')}
+        >
           <BudgetVsActualBarChart data={categoryActuals} />
         </ChartCard>
         <ChartCard title="פילוח הוצאות לפי קטגוריה" isEmpty={categoryActuals.every((r) => (r.actual_total ?? 0) <= 0)}>

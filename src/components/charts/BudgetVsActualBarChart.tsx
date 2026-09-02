@@ -3,11 +3,16 @@ import { categorical, chrome, formatAxisILS } from './chartTheme'
 import type { ViewRow } from '@/lib/supabase/database.types'
 
 export function BudgetVsActualBarChart({ data }: { data: ViewRow<'category_actuals'>[] }) {
-  const chartData = data.map((row) => ({
-    name: row.name_he,
-    actual: row.actual_total ?? 0,
-    target: row.target_total ?? 0,
-  }))
+  // Expense categories only — income sits on a much larger scale (the whole
+  // family's monthly earnings vs. a single spending category) and would
+  // otherwise flatten every expense bar to invisibility on a shared axis.
+  const chartData = data
+    .filter((row) => row.kind === 'expense')
+    .map((row) => ({
+      name: row.name_he,
+      actual: row.actual_total ?? 0,
+      target: row.target_total ?? 0,
+    }))
 
   return (
     <div dir="ltr" className="h-64 w-full">
