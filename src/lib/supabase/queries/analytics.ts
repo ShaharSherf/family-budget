@@ -26,14 +26,3 @@ export async function getCategoryActualsRange(
   if (error) throw error
   return data
 }
-
-/** Per-person spending trend needs the raw lines joined to payments + month, not a rollup view. */
-export async function getPersonSpendingRange(fromMonth: string, toMonth: string) {
-  const { data, error } = await supabase
-    .from('budget_line_payments')
-    .select('paid_amount, family_member_id, budget_lines!inner(month_key, category_id, categories!inner(kind))')
-    .gte('budget_lines.month_key', toMonthDate(fromMonth))
-    .lte('budget_lines.month_key', toMonthDate(toMonth))
-  if (error) throw error
-  return data
-}

@@ -1,20 +1,16 @@
-import { useCategoryActualsRange, useMonthKpisRange, useMonthRange, usePersonSpendingRange } from './hooks/useAnalyticsData'
-import { useFamilyMembers } from '@/features/family-members/useFamilyMembers'
+import { useCategoryActualsRange, useMonthKpisRange, useMonthRange } from './hooks/useAnalyticsData'
 import { useAllContributions, useSavingsGoals } from '@/features/savings-goals/hooks/useSavingsGoals'
 import { ChartCard } from '@/components/charts/ChartCard'
 import { IncomeExpenseNetChart } from './components/IncomeExpenseNetChart'
 import { CategoryTrendChart } from './components/CategoryTrendChart'
 import { GoalProgressChart } from './components/GoalProgressChart'
 import { BudgetAdherenceHeatmap } from './components/BudgetAdherenceHeatmap'
-import { PersonSpendingTrendChart } from './components/PersonSpendingTrendChart'
 import { YtdStatTiles } from './components/YtdStatTiles'
 
 export function AnalyticsPage() {
   const { data: range } = useMonthRange()
   const { data: kpis = [], isLoading: kpisLoading } = useMonthKpisRange(range?.from, range?.to)
   const { data: categoryActuals = [], isLoading: categoryLoading } = useCategoryActualsRange(range?.from, range?.to)
-  const { data: personSpending = [], isLoading: personLoading } = usePersonSpendingRange(range?.from, range?.to)
-  const { data: familyMembers = [] } = useFamilyMembers()
   const { data: goals = [] } = useSavingsGoals()
   const { data: goalContributions = [] } = useAllContributions()
 
@@ -35,13 +31,6 @@ export function AnalyticsPage() {
 
         <ChartCard title="התקדמות יעדי חיסכון" isEmpty={goals.length === 0}>
           <GoalProgressChart goals={goals} contributions={goalContributions} />
-        </ChartCard>
-
-        <ChartCard title="הוצאות לפי בן משפחה" isLoading={personLoading} isEmpty={personSpending.length === 0}>
-          <PersonSpendingTrendChart
-            data={personSpending as unknown as Parameters<typeof PersonSpendingTrendChart>[0]['data']}
-            familyMembers={familyMembers}
-          />
         </ChartCard>
       </div>
 

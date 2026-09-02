@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getCategoryActualsRange, getMonthKpisRange, getPersonSpendingRange } from '@/lib/supabase/queries/analytics'
+import { getCategoryActualsRange, getMonthKpisRange } from '@/lib/supabase/queries/analytics'
 import { getAllMonths } from '@/lib/supabase/queries/months'
 import { fromMonthDate } from '@/lib/month'
 import { queryKeys } from '@/lib/queryClient'
@@ -31,14 +31,6 @@ export function useCategoryActualsRange(fromMonth: string | undefined, toMonth: 
   return useQuery({
     queryKey: ['categoryActualsRange', fromMonth, toMonth],
     queryFn: () => getCategoryActualsRange(fromMonth!, toMonth!),
-    enabled: !!fromMonth && !!toMonth,
-  })
-}
-
-export function usePersonSpendingRange(fromMonth: string | undefined, toMonth: string | undefined) {
-  return useQuery({
-    queryKey: ['personSpendingRange', fromMonth, toMonth],
-    queryFn: () => getPersonSpendingRange(fromMonth!, toMonth!),
     enabled: !!fromMonth && !!toMonth,
   })
 }
