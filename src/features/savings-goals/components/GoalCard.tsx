@@ -3,7 +3,7 @@ import { formatILS, formatMonthLabel } from '@/lib/format'
 import { currentMonthKey, fromMonthDate, toMonthDate } from '@/lib/month'
 import { chrome } from '@/components/charts/chartTheme'
 import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
-import { Input } from '@/components/ui/Input'
+import { Input, NumberInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { ContributionForm } from './ContributionForm'
@@ -25,10 +25,24 @@ function ProgressBar({ value, max }: { value: number; max: number | null }) {
 export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: SavingsGoalBalance[] }) {
   const updateGoal = useUpdateSavingsGoal()
   const [name, setName] = useState(goal.name)
+  const [monthlyTarget, setMonthlyTarget] = useState(goal.monthly_target_amount?.toString() ?? '')
+  const [lifetimeTarget, setLifetimeTarget] = useState(goal.lifetime_target_amount?.toString() ?? '')
 
   const commitName = useDebouncedCallback((value: string) => {
     if (!value.trim() || value === goal.name) return
     updateGoal.mutate({ id: goal.id, patch: { name: value.trim() } })
+  }, 500)
+
+  const commitMonthlyTarget = useDebouncedCallback((value: string) => {
+    const n = value === '' ? null : Number(value)
+    if (n !== null && !Number.isFinite(n)) return
+    updateGoal.mutate({ id: goal.id, patch: { monthly_target_amount: n } })
+  }, 500)
+
+  const commitLifetimeTarget = useDebouncedCallback((value: string) => {
+    const n = value === '' ? null : Number(value)
+    if (n !== null && !Number.isFinite(n)) return
+    updateGoal.mutate({ id: goal.id, patch: { lifetime_target_amount: n } })
   }, 500)
 
   const currentMonthDate = toMonthDate(currentMonthKey())
@@ -63,20 +77,38 @@ export function GoalCard({ goal, balances }: { goal: SavingsGoal; balances: Savi
       </div>
 
       <div className="mt-3 flex flex-col gap-1">
-        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>הפקדה חודשית</span>
-          <span>
-            {formatILS(thisMonthContribution)} / {formatILS(goal.monthly_target_amount)}
+          <span className="flex items-center gap-1">
+            {formatILS(thisMonthContribution)} /
+            <NumberInput
+              className="w-20"
+              placeholder="יעד חודשי"
+              value={monthlyTarget}
+              onChange={(e) => {
+                setMonthlyTarget(e.target.value)
+                commitMonthlyTarget(e.target.value)
+              }}
+            />
           </span>
         </div>
         <ProgressBar value={thisMonthContribution} max={goal.monthly_target_amount} />
       </div>
 
       <div className="mt-3 flex flex-col gap-1">
-        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>יעד כללי</span>
-          <span>
-            {formatILS(cumulativeBalance)} / {formatILS(goal.lifetime_target_amount)}
+          <span className="flex items-center gap-1">
+            {formatILS(cumulativeBalance)} /
+            <NumberInput
+              className="w-24"
+              placeholder="יעד כללי"
+              value={lifetimeTarget}
+              onChange={(e) => {
+                setLifetimeTarget(e.target.value)
+                commitLifetimeTarget(e.target.value)
+              }}
+            />
           </span>
         </div>
         <ProgressBar value={cumulativeBalance} max={goal.lifetime_target_amount} />
