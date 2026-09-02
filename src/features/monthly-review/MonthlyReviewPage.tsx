@@ -36,6 +36,8 @@ export function MonthlyReviewPage() {
     [savingsGoals, monthContributions],
   )
   const groups = useMemo(() => groupByCategory(rows), [rows])
+  const incomeGroups = useMemo(() => groups.filter((g) => g.kind === 'income'), [groups])
+  const expenseGroups = useMemo(() => groups.filter((g) => g.kind === 'expense'), [groups])
   const readOnly = month?.is_closed ?? false
 
   return (
@@ -51,8 +53,9 @@ export function MonthlyReviewPage() {
         <p className="text-sm text-gray-400">טוען...</p>
       ) : (
         <>
-          <MonthlyTable groups={groups} monthKey={monthKey} readOnly={readOnly} />
+          <MonthlyTable groups={incomeGroups} monthKey={monthKey} readOnly={readOnly} />
           <SavingsSection monthKey={monthKey} readOnly={readOnly} />
+          <MonthlyTable groups={expenseGroups} monthKey={monthKey} readOnly={readOnly} />
         </>
       )}
 

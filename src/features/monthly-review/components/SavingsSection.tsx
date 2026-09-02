@@ -6,12 +6,13 @@ import { NumberInput } from '@/components/ui/Input'
 import {
   useMonthlySavingsContributions,
   useSavingsGoals,
+  useUpsertActualBalance,
   useUpsertContribution,
 } from '@/features/savings-goals/hooks/useSavingsGoals'
 import type { SavingsGoal } from '@/lib/supabase/queries/savingsGoals'
 import type { Tables } from '@/lib/supabase/database.types'
 
-const HEADERS = ['יעד חיסכון', 'בפועל', 'תקציב', 'פער']
+const HEADERS = ['יעד חיסכון', 'הפקדה', 'יתרה בפועל (מהבנק/ברוקר)', 'תקציב', 'פער']
 
 function GoalRow({
   goal,
@@ -24,17 +25,25 @@ function GoalRow({
   monthKey: string
   readOnly: boolean
 }) {
-  const upsert = useUpsertContribution()
-  const [actual, setActual] = useState(contribution?.contributed_amount?.toString() ?? '')
+  const upsertContribution = useUpsertContribution()
+  const upsertBalance = useUpsertActualBalance()
+  const [deposit, setDeposit] = useState(contribution?.contributed_amount?.toString() ?? '')
+  const [balance, setBalance] = useState(contribution?.actual_balance_amount?.toString() ?? '')
 
-  const commit = useDebouncedCallback((value: number) => {
-    upsert.mutate({ goalId: goal.id, monthKey, contributedAmount: value })
+  const commitDeposit = useDebouncedCallback((value: number) => {
+    upsertContribution.mutate({ goalId: goal.id, monthKey, contributedAmount: value })
   }, 400)
 
-  const actualAmount = contribution?.contributed_amount ?? 0
+  const commitBalance = useDebouncedCallback((value: string) => {
+    const n = value === '' ? null : Number(value)
+    if (n !== null && !Number.isFinite(n)) return
+    upsertBalance.mutate({ goalId: goal.id, monthKey, actualBalanceAmount: n })
+  }, 400)
+
+  const depositAmount = contribution?.contributed_amount ?? 0
   const target = goal.monthly_target_amount
   const hasTarget = target !== null && target > 0
-  const diff = hasTarget ? actualAmount - target : null
+  const diff = hasTarget ? depositAmount - target : null
   const isGood = diff !== null && diff > 0
   const isWarning = diff !== null && diff < 0
 
@@ -44,13 +53,25 @@ function GoalRow({
       <td className="px-2 py-1.5">
         <NumberInput
           className="w-24"
-          value={actual}
+          value={deposit}
           disabled={readOnly}
           placeholder="0"
           onChange={(e) => {
-            setActual(e.target.value)
+            setDeposit(e.target.value)
             const n = Number(e.target.value)
-            if (Number.isFinite(n)) commit(n)
+            if (Number.isFinite(n)) commitDeposit(n)
+          }}
+        />
+      </td>
+      <td className="px-2 py-1.5">
+        <NumberInput
+          className="w-28"
+          value={balance}
+          disabled={readOnly}
+          placeholder="יתרה בפועל"
+          onChange={(e) => {
+            setBalance(e.target.value)
+            commitBalance(e.target.value)
           }}
         />
       </td>
@@ -79,7 +100,7 @@ export function SavingsSection({ monthKey, readOnly }: { monthKey: string; readO
   if (activeGoals.length === 0) return null
 
   const contributionByGoal = new Map(contributions.map((c) => [c.goal_id, c]))
-  const actualTotal = activeGoals.reduce((sum, g) => sum + (contributionByGoal.get(g.id)?.contributed_amount ?? 0), 0)
+  const depositTotal = activeGoals.reduce((sum, g) => sum + (contributionByGoal.get(g.id)?.contributed_amount ?? 0), 0)
   const targetTotal = activeGoals.reduce((sum, g) => sum + (g.monthly_target_amount ?? 0), 0)
 
   return (
@@ -98,8 +119,9 @@ export function SavingsSection({ monthKey, readOnly }: { monthKey: string; readO
           <tr className="bg-gray-100 dark:bg-gray-800/60">
             <td className="px-2 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200">חיסכון</td>
             <td className="px-2 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
-              {formatILS(actualTotal)}
+              {formatILS(depositTotal)}
             </td>
+            <td className="px-2 py-1 text-sm text-gray-400 dark:text-gray-500">—</td>
             <td colSpan={2} className="px-2 py-1 text-sm text-gray-500 dark:text-gray-400">
               מתוכנן: {formatILS(targetTotal)}
             </td>
