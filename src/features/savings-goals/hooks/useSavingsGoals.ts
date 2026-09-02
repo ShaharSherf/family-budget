@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createSavingsGoal,
   getAllSavingsGoalBalances,
+  getContributionsForMonth,
   getSavingsGoals,
   updateSavingsGoal,
   upsertContribution,
@@ -15,6 +16,13 @@ export function useSavingsGoals() {
 
 export function useAllSavingsGoalBalances() {
   return useQuery({ queryKey: queryKeys.savingsGoalBalances, queryFn: getAllSavingsGoalBalances })
+}
+
+export function useMonthlySavingsContributions(monthKey: string) {
+  return useQuery({
+    queryKey: queryKeys.monthSavingsContributions(monthKey),
+    queryFn: () => getContributionsForMonth(monthKey),
+  })
 }
 
 export function useCreateSavingsGoal() {
@@ -41,6 +49,7 @@ export function useUpsertContribution() {
       upsertContribution(vars.goalId, vars.monthKey, vars.contributedAmount, vars.notes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalBalances })
+      queryClient.invalidateQueries({ queryKey: ['savingsContributions'] })
     },
   })
 }

@@ -42,6 +42,15 @@ export async function getAllSavingsGoalBalances(): Promise<SavingsGoalBalance[]>
   return data as unknown as SavingsGoalBalance[]
 }
 
+export async function getContributionsForMonth(monthKey: string): Promise<Tables<'savings_contributions'>[]> {
+  const { data, error } = await supabase
+    .from('savings_contributions')
+    .select('*')
+    .eq('month_key', toMonthDate(monthKey))
+  if (error) throw error
+  return data
+}
+
 export async function upsertContribution(
   goalId: string,
   monthKey: string,

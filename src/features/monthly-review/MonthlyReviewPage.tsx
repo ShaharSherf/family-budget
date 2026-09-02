@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { currentMonthKey } from '@/lib/month'
 import { useBudgetLines } from './hooks/useBudgetLines'
 import { useMonth } from './hooks/useMonth'
-import { computeTotals, groupByCategory } from './utils'
+import { computeSavingsTotals, computeTotals, groupByCategory } from './utils'
 import { MonthPicker } from './components/MonthPicker'
 import { BudgetActualSummary } from './components/BudgetActualSummary'
 import { CloseMonthToggle } from './components/CloseMonthToggle'
@@ -14,6 +14,7 @@ import { CategoryBreakdownPieChart } from '@/components/charts/CategoryBreakdown
 import { useQuery } from '@tanstack/react-query'
 import { getCategoryActualsRange } from '@/lib/supabase/queries/analytics'
 import { queryKeys } from '@/lib/queryClient'
+import { useMonthlySavingsContributions, useSavingsGoals } from '@/features/savings-goals/hooks/useSavingsGoals'
 
 export function MonthlyReviewPage() {
   const params = useParams<{ month: string }>()
@@ -25,8 +26,14 @@ export function MonthlyReviewPage() {
     queryKey: queryKeys.categoryActuals(monthKey),
     queryFn: () => getCategoryActualsRange(monthKey, monthKey),
   })
+  const { data: savingsGoals = [] } = useSavingsGoals()
+  const { data: monthContributions = [] } = useMonthlySavingsContributions(monthKey)
 
   const totals = useMemo(() => computeTotals(rows), [rows])
+  const savingsTotals = useMemo(
+    () => computeSavingsTotals(savingsGoals, monthContributions),
+    [savingsGoals, monthContributions],
+  )
   const groups = useMemo(() => groupByCategory(rows), [rows])
   const readOnly = month?.is_closed ?? false
 
@@ -37,7 +44,7 @@ export function MonthlyReviewPage() {
         <CloseMonthToggle monthKey={monthKey} />
       </div>
 
-      <BudgetActualSummary totals={totals} />
+      <BudgetActualSummary totals={totals} savings={savingsTotals} />
 
       {isLoading ? (
         <p className="text-sm text-gray-400">טוען...</p>

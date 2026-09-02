@@ -21,5 +21,6 @@ export const queryKeys = {
   savingsGoals: ['savingsGoals'] as const,
   goalContributions: (goalId: string) => ['goalContributions', goalId] as const,
   savingsGoalBalances: ['savingsGoalBalances'] as const,
+  monthSavingsContributions: (monthKey: string) => ['savingsContributions', monthKey] as const,
   analytics: (fromMonth: string, toMonth: string) => ['analytics', fromMonth, toMonth] as const,
 }
