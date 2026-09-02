@@ -6,12 +6,21 @@
 // the resolved names before writing anything, so you can confirm the mapping
 // is right before it provisions real Supabase Auth accounts).
 //
+// _2_ and _3_EMAIL are optional: leave either blank to import that family
+// member's budget data (still needed for the spreadsheet's category/detail
+// structure) without creating a login account for them yet. Their account
+// can be added later directly in the Supabase dashboard (Authentication ->
+// Users -> Add user, then link family_members.auth_user_id and add their
+// email to allowed_signup_emails).
+//
 // Uses the service_role key, which bypasses RLS — appropriate for this
 // trusted, one-shot, local run. Never bundle this key (or this script) into
 // the deployed Vite app.
 
-import 'dotenv/config'
+import { config as loadEnv } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
+
+loadEnv({ path: '.env.local' })
 import type { Database } from '../../src/lib/supabase/database.types'
 import {
   loadWorkbook,
@@ -33,10 +42,10 @@ const SUPABASE_URL = requireEnv('SUPABASE_URL')
 const SERVICE_ROLE_KEY = requireEnv('SUPABASE_SERVICE_ROLE_KEY')
 const EXCEL_FILE_PATH = process.env.EXCEL_FILE_PATH
   ?? 'C:\\Users\\shahar.s\\Downloads\\תקציב_חודשי_משפחתי_גיליון_אחד (version 1).xlsx'
-const MEMBER_EMAILS = [
+const MEMBER_EMAILS: (string | undefined)[] = [
   requireEnv('FAMILY_MEMBER_1_EMAIL'),
-  requireEnv('FAMILY_MEMBER_2_EMAIL'),
-  requireEnv('FAMILY_MEMBER_3_EMAIL'),
+  process.env.FAMILY_MEMBER_2_EMAIL || undefined,
+  process.env.FAMILY_MEMBER_3_EMAIL || undefined,
 ]
 
 function requireEnv(name: string): string {
@@ -129,9 +138,16 @@ async function main() {
       .select('id')
       .single()
     if (memberError) throw memberError
+    familyMemberIds.push(member.id)
+
+    const email = MEMBER_EMAILS[i]
+    if (!email) {
+      console.log(`Skipping login account for ${personNames[i]} (no email provided).`)
+      continue
+    }
 
     const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-      email: MEMBER_EMAILS[i],
+      email,
       email_confirm: true,
     })
     if (authError) throw authError
@@ -144,10 +160,8 @@ async function main() {
 
     const { error: allowError } = await supabase
       .from('allowed_signup_emails')
-      .insert({ email: MEMBER_EMAILS[i].toLowerCase() })
+      .insert({ email: email.toLowerCase() })
     if (allowError) throw allowError
-
-    familyMemberIds.push(member.id)
   }
   console.log('Created 3 family members with linked auth accounts.')
 

@@ -9,7 +9,7 @@
     "lint": "oxlint && node scripts/check-no-physical-rtl-classes.mjs",
     "format": "prettier --write .",
     "preview": "vite preview",
-    "migrate": "tsx scripts/migrate/import.ts",
+    "migrate": "cross-env NODE_OPTIONS=--use-system-ca tsx scripts/migrate/import.ts",
     "db:types": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
@@ -33,6 +33,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "oxlint": "^1.79.0",
     "prettier": "^3.9.6",

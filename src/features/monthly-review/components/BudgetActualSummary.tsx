@@ -6,15 +6,20 @@ function Tile({
   label,
   actual,
   target,
-  positiveIsGood = true,
+  warnIfOverTarget = false,
+  warnIfNegative = false,
 }: {
   label: string
   actual: number
   target?: number
-  positiveIsGood?: boolean
+  /** Exceeding target is bad — use for expenses, never for income (exceeding an income target is good). */
+  warnIfOverTarget?: boolean
+  /** Being negative is bad — use for a net/leftover figure. */
+  warnIfNegative?: boolean
 }) {
-  const overTarget = target !== undefined && target > 0 && actual > target
-  const isGood = positiveIsGood ? actual >= 0 : actual <= 0
+  const isWarning =
+    (warnIfOverTarget && target !== undefined && target > 0 && actual > target) ||
+    (warnIfNegative && actual < 0)
 
   return (
     <div className="flex-1 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
@@ -22,8 +27,7 @@ function Tile({
       <div
         className={cn(
           'text-lg font-bold',
-          isGood ? 'text-gray-900 dark:text-gray-100' : 'text-red-600 dark:text-red-400',
-          overTarget && 'text-red-600 dark:text-red-400',
+          isWarning ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100',
         )}
       >
         {formatILS(actual)}
@@ -39,8 +43,13 @@ export function BudgetActualSummary({ totals }: { totals: MonthTotals }) {
   return (
     <div className="flex flex-wrap gap-3">
       <Tile label="הכנסות בפועל" actual={totals.incomeActual} target={totals.incomeTarget} />
-      <Tile label="הוצאות בפועל" actual={totals.expenseActual} target={totals.expenseTarget} positiveIsGood={false} />
-      <Tile label="נותר בסוף החודש" actual={totals.leftoverActual} />
+      <Tile
+        label="הוצאות בפועל"
+        actual={totals.expenseActual}
+        target={totals.expenseTarget}
+        warnIfOverTarget
+      />
+      <Tile label="נותר בסוף החודש" actual={totals.leftoverActual} warnIfNegative />
     </div>
   )
 }

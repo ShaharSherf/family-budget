@@ -35,6 +35,9 @@ export function MonthlyTableRow({
     row.target_amount !== null && row.family_actual_amount !== null
       ? row.target_amount - row.family_actual_amount
       : null
+  // Negative "remaining" only means trouble for expenses (over budget) — for
+  // income it means the family earned more than planned, which is good news.
+  const remainingIsWarning = remaining !== null && remaining < 0 && row.category.kind === 'expense'
 
   return (
     <tr className={row.needs_review ? 'bg-amber-50 dark:bg-amber-950/30' : undefined}>
@@ -88,7 +91,7 @@ export function MonthlyTableRow({
       </td>
       <td
         className={
-          remaining !== null && remaining < 0
+          remainingIsWarning
             ? 'px-2 py-1.5 text-sm font-medium text-red-600 dark:text-red-400'
             : 'px-2 py-1.5 text-sm text-gray-500 dark:text-gray-400'
         }
