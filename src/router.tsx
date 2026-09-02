@@ -6,7 +6,6 @@ import { AnalyticsPage } from '@/features/analytics/AnalyticsPage'
 import { SavingsGoalsPage } from '@/features/savings-goals/SavingsGoalsPage'
 import { CategoriesSettingsPage } from '@/features/categories/CategoriesSettingsPage'
 import { FamilyMembersSettingsPage } from '@/features/family-members/FamilyMembersSettingsPage'
-import { RecurringTemplatesPage } from '@/features/recurring-templates/RecurringTemplatesPage'
 import { currentMonthKey } from '@/lib/month'
 import { getLastViewedMonth } from '@/lib/lastViewedMonth'
 
@@ -24,7 +23,6 @@ export function AppRouter() {
         <Route path="/savings-goals" element={<SavingsGoalsPage />} />
         <Route path="/settings/categories" element={<CategoriesSettingsPage />} />
         <Route path="/settings/family-members" element={<FamilyMembersSettingsPage />} />
-        <Route path="/settings/recurring-templates" element={<RecurringTemplatesPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -99,54 +99,6 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['months']['Insert']>
         Relationships: []
       }
-      recurring_templates: {
-        Row: {
-          id: string
-          category_id: string
-          detail_id: string
-          default_target_amount: number | null
-          default_actual_amount: number | null
-          default_share_pct: number
-          default_notes: string | null
-          is_active: boolean
-          effective_from: string
-          effective_until: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          category_id: string
-          detail_id: string
-          default_target_amount?: number | null
-          default_actual_amount?: number | null
-          default_share_pct?: number
-          default_notes?: string | null
-          is_active?: boolean
-          effective_from: string
-          effective_until?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: Partial<Database['public']['Tables']['recurring_templates']['Insert']>
-        Relationships: []
-      }
-      recurring_template_default_payments: {
-        Row: {
-          id: string
-          template_id: string
-          family_member_id: string
-          default_paid_amount: number
-        }
-        Insert: {
-          id?: string
-          template_id: string
-          family_member_id: string
-          default_paid_amount?: number
-        }
-        Update: Partial<Database['public']['Tables']['recurring_template_default_payments']['Insert']>
-        Relationships: []
-      }
       budget_lines: {
         Row: {
           id: string
@@ -158,9 +110,6 @@ export interface Database {
           share_pct: number
           family_actual_amount: number | null
           notes: string | null
-          template_id: string | null
-          is_template_override: boolean
-          needs_review: boolean
           created_at: string
           updated_at: string
         }
@@ -173,9 +122,6 @@ export interface Database {
           actual_amount?: number | null
           share_pct?: number
           notes?: string | null
-          template_id?: string | null
-          is_template_override?: boolean
-          needs_review?: boolean
           created_at?: string
           updated_at?: string
         }

@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
 import { formatILS } from '@/lib/format'
-import { Badge } from '@/components/ui/Badge'
 import { NumberInput, Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
-import { CheckIcon } from '@/components/ui/icons'
 import { useDeleteBudgetLine, useUpdateBudgetLine } from '../hooks/useBudgetLineMutations'
 import { WhoPaidCell } from './WhoPaidCell'
 import type { BudgetLineWithRelations } from '@/types/domain'
@@ -28,7 +26,7 @@ export function MonthlyTableRow({
   const [notes, setNotes] = useState(row.notes ?? '')
 
   const commit = useDebouncedCallback((patch: TablesUpdate<'budget_lines'>) => {
-    update.mutate({ id: row.id, patch: { ...patch, needs_review: false, is_template_override: row.template_id ? true : row.is_template_override } })
+    update.mutate({ id: row.id, patch })
   }, 400)
 
   const hasComparison = row.target_amount !== null && row.family_actual_amount !== null
@@ -48,14 +46,8 @@ export function MonthlyTableRow({
   const remainingIsGood = remaining !== null && (isIncome ? incomeDiff! > 0 : remaining > 0)
 
   return (
-    <tr className={row.needs_review ? 'bg-amber-50 dark:bg-amber-950/30' : undefined}>
-      <td className="px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100">
-        <div className="flex items-center gap-1.5">
-          {row.detail.name_he}
-          {row.needs_review && <Badge tone="warning">לבדיקה</Badge>}
-          {row.is_template_override && <Badge tone="neutral">שונה מהתבנית</Badge>}
-        </div>
-      </td>
+    <tr>
+      <td className="px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100">{row.detail.name_he}</td>
       <td className="px-2 py-1.5">
         <NumberInput
           className="w-24"
@@ -122,13 +114,8 @@ export function MonthlyTableRow({
           }}
         />
       </td>
-      <td className="flex gap-1 px-2 py-1.5">
-        {row.needs_review && !readOnly && (
-          <Button variant="ghost" onClick={() => update.mutate({ id: row.id, patch: { needs_review: false } })}>
-            <CheckIcon />
-          </Button>
-        )}
-        {!readOnly && !row.template_id && (
+      <td className="px-2 py-1.5">
+        {!readOnly && (
           <Button variant="ghost" onClick={() => remove.mutate(row.id)}>
             ✕
           </Button>
