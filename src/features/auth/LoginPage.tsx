@@ -26,7 +26,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-1 text-xl font-bold text-gray-900 dark:text-gray-100">תקציב המשפחה</h1>
         <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">התחברות באמצעות קישור למייל</p>

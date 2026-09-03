@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950">
+    <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">תקציב המשפחה</h1>
