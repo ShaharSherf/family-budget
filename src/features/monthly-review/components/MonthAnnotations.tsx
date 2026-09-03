@@ -48,7 +48,7 @@ export function MonthAnnotations({
       ))}
       <Input
         className="min-w-56 flex-1"
-        placeholder="הערות לחודש (ESPP, שינוי אחוז וכו׳)"
+        placeholder="הערות"
         value={notes}
         disabled={readOnly}
         onChange={(e) => {
