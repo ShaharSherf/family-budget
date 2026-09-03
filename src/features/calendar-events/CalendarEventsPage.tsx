@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   useCalendarEvents,
   useCreateCalendarEvent,
@@ -6,6 +6,7 @@ import {
   useUpdateCalendarEvent,
 } from './useCalendarEvents'
 import { addMonths, currentMonthKey } from '@/lib/month'
+import { getLastViewedCalendarMonth, setLastViewedCalendarMonth } from '@/lib/lastViewedMonth'
 import { formatMonthLabel, formatMonthOfYear } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import { ChevronEnd, ChevronStart } from '@/components/ui/icons'
@@ -128,8 +129,12 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
 
 export function CalendarEventsPage() {
   const { data: events = [] } = useCalendarEvents()
-  const [viewMonthKey, setViewMonthKey] = useState(currentMonthKey())
+  const [viewMonthKey, setViewMonthKey] = useState(getLastViewedCalendarMonth() ?? currentMonthKey())
   const [dialogState, setDialogState] = useState<DialogState>(null)
+
+  useEffect(() => {
+    setLastViewedCalendarMonth(viewMonthKey)
+  }, [viewMonthKey])
 
   const [year, month] = viewMonthKey.split('-').map(Number)
   const weeks = useMemo(() => buildWeeks(year, month), [year, month])
