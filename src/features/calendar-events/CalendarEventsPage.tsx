@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Dialog } from '@/components/ui/Dialog'
+import { EVENT_COLORS, eventColorBadgeClasses } from './eventColors'
 import type { CalendarEvent } from '@/lib/supabase/queries/calendarEvents'
 
 const WEEKDAY_LABELS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש']
@@ -52,6 +53,7 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
   const [notes, setNotes] = useState(state?.mode === 'edit' ? state.event.notes ?? '' : '')
   const [month, setMonth] = useState(String(state ? (state.mode === 'edit' ? state.event.month : state.month) : 1))
   const [day, setDay] = useState(String(state ? (state.mode === 'edit' ? state.event.day : state.day) : 1))
+  const [color, setColor] = useState(state?.mode === 'edit' ? state.event.color : EVENT_COLORS[0].value)
 
   if (!state) return null
   const target = state
@@ -60,7 +62,7 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
     const dayNum = Number(day)
     const monthNum = Number(month)
     if (!title.trim() || !Number.isInteger(dayNum) || dayNum < 1 || dayNum > 31) return
-    const patch = { title: title.trim(), month: monthNum, day: dayNum, notes: notes.trim() === '' ? null : notes }
+    const patch = { title: title.trim(), month: monthNum, day: dayNum, color, notes: notes.trim() === '' ? null : notes }
     if (target.mode === 'create') {
       createEvent.mutate(patch, { onSuccess: onClose })
     } else {
@@ -89,6 +91,21 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
           />
         </div>
         <Input placeholder="הערות" value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <div className="flex items-center gap-2">
+          {EVENT_COLORS.map((c) => (
+            <button
+              key={c.value}
+              type="button"
+              aria-label={c.value}
+              onClick={() => setColor(c.value)}
+              className={cn(
+                'h-6 w-6 rounded-full',
+                c.swatch,
+                color === c.value && 'ring-2 ring-offset-2 ring-gray-400 dark:ring-offset-gray-900',
+              )}
+            />
+          ))}
+        </div>
         <div className="flex items-center justify-between gap-2">
           {target.mode === 'edit' ? (
             <Button
@@ -201,7 +218,7 @@ export function CalendarEventsPage() {
                       e.stopPropagation()
                       setDialogState({ mode: 'edit', event })
                     }}
-                    className="truncate rounded bg-blue-100 px-1 py-0.5 text-start text-xs text-blue-800 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
+                    className={cn('truncate rounded px-1 py-0.5 text-start text-xs hover:opacity-80', eventColorBadgeClasses(event.color))}
                     title={event.title}
                   >
                     {event.title}

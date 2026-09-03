@@ -3,8 +3,10 @@ import { useFamilyMembers } from '@/features/family-members/useFamilyMembers'
 import { useCalendarEvents } from '@/features/calendar-events/useCalendarEvents'
 import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
 import { formatMonthOfYear } from '@/lib/format'
+import { cn } from '@/lib/cn'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
+import { eventColorBadgeClasses } from '@/features/calendar-events/eventColors'
 import { useSetMonthNotes } from '../hooks/useMonth'
 
 export function MonthAnnotations({
@@ -40,10 +42,12 @@ export function MonthAnnotations({
         </Badge>
       ))}
       {monthEvents.map((event) => (
-        <span key={event.id} title={event.notes ?? undefined}>
-          <Badge tone="neutral">
-            {event.day} ב{formatMonthOfYear(monthOfYear)} — {event.title}
-          </Badge>
+        <span
+          key={event.id}
+          title={event.notes ?? undefined}
+          className={cn('rounded-full px-2 py-0.5 text-xs font-medium', eventColorBadgeClasses(event.color))}
+        >
+          {event.day} ב{formatMonthOfYear(monthOfYear)} — {event.title}
         </span>
       ))}
       <Input

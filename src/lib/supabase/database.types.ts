@@ -208,6 +208,7 @@ export interface Database {
           title: string
           month: number
           day: number
+          color: string
           notes: string | null
           created_at: string
         }
@@ -216,6 +217,7 @@ export interface Database {
           title: string
           month: number
           day: number
+          color?: string
           notes?: string | null
           created_at?: string
         }
