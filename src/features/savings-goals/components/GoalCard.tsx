@@ -12,9 +12,13 @@ import { computeGoalMonthBalances } from '../utils'
 import type { SavingsGoal, SavingsContribution } from '@/lib/supabase/queries/savingsGoals'
 
 function ProgressBar({ value, max }: { value: number; max: number | null }) {
-  const pct = max && max > 0 ? Math.min(100, (value / max) * 100) : 0
+  const rawPct = max && max > 0 ? (value / max) * 100 : 0
+  const pct = Math.min(100, rawPct)
   return (
-    <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800">
+    <div
+      className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800"
+      title={`${Math.round(rawPct)}%`}
+    >
       <div
         className="h-2 rounded-full"
         style={{ width: `${pct}%`, background: 'var(--series-1)', borderColor: chrome.gridline }}
