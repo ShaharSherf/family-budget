@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase/client'
 import { currentMonthKey } from '@/lib/month'
 import { getLastViewedMonth } from '@/lib/lastViewedMonth'
+import { setCatBackgroundEnabled, useCatBackgroundEnabled } from '@/lib/catBackgroundPreference'
 import { cn } from '@/lib/cn'
 
 const STATIC_NAV_ITEMS = [
@@ -15,6 +16,7 @@ const STATIC_NAV_ITEMS = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
+  const catsEnabled = useCatBackgroundEnabled()
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -59,12 +61,22 @@ export function AppShell({ children }: { children: ReactNode }) {
               </NavLink>
             ))}
           </nav>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            התנתקות
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setCatBackgroundEnabled(!catsEnabled)}
+              aria-pressed={catsEnabled}
+              className="rounded-md px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
+              title={catsEnabled ? 'הסתרת רקע חתולים' : 'הצגת רקע חתולים'}
+            >
+              {catsEnabled ? '🐱' : '🚫'}
+            </button>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              התנתקות
+            </button>
+          </div>
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>

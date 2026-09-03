@@ -2,9 +2,14 @@
 // cataas.com API. Purely visual — aria-hidden, no pointer events — kept
 // behind actual UI, which all has its own opaque card/header backgrounds
 // so this never hurts readability even at a fairly visible opacity.
+import { useCatBackgroundEnabled } from '@/lib/catBackgroundPreference'
+
 const TILE_COUNT = 60
 
 export function CatBackground() {
+  const enabled = useCatBackgroundEnabled()
+  if (!enabled) return null
+
   return (
     <div
       aria-hidden
