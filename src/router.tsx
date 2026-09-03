@@ -6,6 +6,7 @@ import { AnalyticsPage } from '@/features/analytics/AnalyticsPage'
 import { SavingsGoalsPage } from '@/features/savings-goals/SavingsGoalsPage'
 import { CategoriesSettingsPage } from '@/features/categories/CategoriesSettingsPage'
 import { FamilyMembersSettingsPage } from '@/features/family-members/FamilyMembersSettingsPage'
+import { CalendarEventsPage } from '@/features/calendar-events/CalendarEventsPage'
 import { currentMonthKey } from '@/lib/month'
 import { getLastViewedMonth } from '@/lib/lastViewedMonth'
 
@@ -21,6 +22,7 @@ export function AppRouter() {
         <Route path="/monthly/:month" element={<MonthlyReviewPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/savings-goals" element={<SavingsGoalsPage />} />
+        <Route path="/calendar" element={<CalendarEventsPage />} />
         <Route path="/settings/categories" element={<CategoriesSettingsPage />} />
         <Route path="/settings/family-members" element={<FamilyMembersSettingsPage />} />
       </Route>

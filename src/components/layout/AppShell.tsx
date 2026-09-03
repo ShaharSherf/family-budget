@@ -8,6 +8,7 @@ import { cn } from '@/lib/cn'
 const STATIC_NAV_ITEMS = [
   { to: '/analytics', label: 'ניתוח ומגמות', match: '/analytics' },
   { to: '/savings-goals', label: 'יעדי חיסכון', match: '/savings-goals' },
+  { to: '/calendar', label: 'אירועים', match: '/calendar' },
   { to: '/settings/categories', label: 'קטגוריות', match: '/settings/categories' },
   { to: '/settings/family-members', label: 'בני משפחה', match: '/settings/family-members' },
 ]

@@ -202,6 +202,26 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['allowed_signup_emails']['Insert']>
         Relationships: []
       }
+      calendar_events: {
+        Row: {
+          id: string
+          title: string
+          month: number
+          day: number
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          month: number
+          day: number
+          notes?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['calendar_events']['Insert']>
+        Relationships: []
+      }
     }
     Views: {
       category_actuals: {
