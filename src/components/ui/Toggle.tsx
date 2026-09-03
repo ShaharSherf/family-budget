@@ -1,15 +1,17 @@
+import type { ReactNode } from 'react'
 import * as RadixToggle from '@radix-ui/react-toggle'
-import { LockIcon } from './icons'
 import { cn } from '@/lib/cn'
 
 interface ToggleProps {
   pressed: boolean
   onPressedChange: (pressed: boolean) => void
   label: string
+  /** Shown before the label only while pressed — e.g. a lock icon for a "closed month" toggle. */
+  pressedIcon?: ReactNode
   className?: string
 }
 
-export function Toggle({ pressed, onPressedChange, label, className }: ToggleProps) {
+export function Toggle({ pressed, onPressedChange, label, pressedIcon, className }: ToggleProps) {
   return (
     <RadixToggle.Root
       pressed={pressed}
@@ -22,7 +24,7 @@ export function Toggle({ pressed, onPressedChange, label, className }: TogglePro
         className,
       )}
     >
-      {pressed && <LockIcon />}
+      {pressed && pressedIcon}
       {label}
     </RadixToggle.Root>
   )
