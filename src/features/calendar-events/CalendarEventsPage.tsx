@@ -54,21 +54,22 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
   const [day, setDay] = useState(String(state ? (state.mode === 'edit' ? state.event.day : state.day) : 1))
 
   if (!state) return null
+  const target = state
 
   function handleSave() {
     const dayNum = Number(day)
     const monthNum = Number(month)
     if (!title.trim() || !Number.isInteger(dayNum) || dayNum < 1 || dayNum > 31) return
     const patch = { title: title.trim(), month: monthNum, day: dayNum, notes: notes.trim() === '' ? null : notes }
-    if (state.mode === 'create') {
+    if (target.mode === 'create') {
       createEvent.mutate(patch, { onSuccess: onClose })
     } else {
-      updateEvent.mutate({ id: state.event.id, patch }, { onSuccess: onClose })
+      updateEvent.mutate({ id: target.event.id, patch }, { onSuccess: onClose })
     }
   }
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()} title={state.mode === 'create' ? 'אירוע חדש' : 'עריכת אירוע'}>
+    <Dialog open onOpenChange={(open) => !open && onClose()} title={target.mode === 'create' ? 'אירוע חדש' : 'עריכת אירוע'}>
       <div className="flex flex-col gap-3">
         <Input placeholder="שם האירוע" value={title} onChange={(e) => setTitle(e.target.value)} />
         <div className="flex gap-2">
@@ -89,10 +90,10 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
         </div>
         <Input placeholder="הערות" value={notes} onChange={(e) => setNotes(e.target.value)} />
         <div className="flex items-center justify-between gap-2">
-          {state.mode === 'edit' ? (
+          {target.mode === 'edit' ? (
             <Button
               variant="danger"
-              onClick={() => deleteEvent.mutate(state.event.id, { onSuccess: onClose })}
+              onClick={() => deleteEvent.mutate(target.event.id, { onSuccess: onClose })}
             >
               מחיקה
             </Button>
