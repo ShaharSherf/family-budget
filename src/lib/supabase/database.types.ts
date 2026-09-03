@@ -15,6 +15,7 @@ export interface Database {
           display_name: string
           auth_user_id: string | null
           birthday_month: number | null
+          birthday_day: number | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -24,6 +25,7 @@ export interface Database {
           display_name: string
           auth_user_id?: string | null
           birthday_month?: number | null
+          birthday_day?: number | null
           is_active?: boolean
           created_at?: string
           updated_at?: string

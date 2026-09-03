@@ -15,7 +15,9 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Dialog } from '@/components/ui/Dialog'
 import { EVENT_COLORS, eventColorBadgeClasses } from './eventColors'
+import { useFamilyMembers } from '@/features/family-members/useFamilyMembers'
 import type { CalendarEvent } from '@/lib/supabase/queries/calendarEvents'
+import type { FamilyMember } from '@/lib/supabase/queries/familyMembers'
 
 const WEEKDAY_LABELS = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש']
 const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
@@ -129,6 +131,7 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
 
 export function CalendarEventsPage() {
   const { data: events = [] } = useCalendarEvents()
+  const { data: members = [] } = useFamilyMembers()
   const [viewMonthKey, setViewMonthKey] = useState(getLastViewedCalendarMonth() ?? currentMonthKey())
   const [dialogState, setDialogState] = useState<DialogState>(null)
 
@@ -149,6 +152,17 @@ export function CalendarEventsPage() {
     }
     return map
   }, [events, month])
+
+  const birthdaysByDay = useMemo(() => {
+    const map = new Map<number, FamilyMember[]>()
+    for (const member of members) {
+      if (!member.is_active || member.birthday_month !== month || !member.birthday_day) continue
+      const list = map.get(member.birthday_day) ?? []
+      list.push(member)
+      map.set(member.birthday_day, list)
+    }
+    return map
+  }, [members, month])
 
   const today = new Date()
   const isCurrentMonth = today.getFullYear() === year && today.getMonth() + 1 === month
@@ -194,6 +208,7 @@ export function CalendarEventsPage() {
         {weeks.map((week, weekIdx) =>
           week.map((day, dayIdx) => {
             const dayEvents = day ? eventsByDay.get(day) ?? [] : []
+            const dayBirthdays = day ? birthdaysByDay.get(day) ?? [] : []
             const isToday = isCurrentMonth && day === today.getDate()
             return (
               <div
@@ -216,6 +231,15 @@ export function CalendarEventsPage() {
                     {day}
                   </span>
                 )}
+                {dayBirthdays.map((member) => (
+                  <span
+                    key={member.id}
+                    className="truncate rounded bg-pink-100 px-1 py-0.5 text-start text-xs text-pink-800 dark:bg-pink-900/40 dark:text-pink-300"
+                    title={`יומולדת ${member.display_name}`}
+                  >
+                    🎂 {member.display_name}
+                  </span>
+                ))}
                 {dayEvents.map((event) => (
                   <button
                     key={event.id}

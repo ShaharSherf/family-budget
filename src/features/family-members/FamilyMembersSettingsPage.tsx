@@ -17,10 +17,17 @@ const BIRTHDAY_MONTH_OPTIONS = [
 function MemberRow({ member }: { member: FamilyMember }) {
   const updateMember = useUpdateFamilyMember()
   const [name, setName] = useState(member.display_name)
+  const [day, setDay] = useState(member.birthday_day ? String(member.birthday_day) : '')
 
   const commitName = useDebouncedCallback((value: string) => {
     if (!value.trim() || value === member.display_name) return
     updateMember.mutate({ id: member.id, patch: { display_name: value.trim() } })
+  }, 500)
+
+  const commitDay = useDebouncedCallback((value: string) => {
+    const n = value === '' ? null : Number(value)
+    if (n !== null && (!Number.isInteger(n) || n < 1 || n > 31)) return
+    updateMember.mutate({ id: member.id, patch: { birthday_day: n } })
   }, 500)
 
   return (
@@ -44,6 +51,18 @@ function MemberRow({ member }: { member: FamilyMember }) {
           }
           options={BIRTHDAY_MONTH_OPTIONS}
           placeholder="חודש יומולדת"
+        />
+        <Input
+          className="w-14"
+          type="number"
+          min={1}
+          max={31}
+          placeholder="יום"
+          value={day}
+          onChange={(e) => {
+            setDay(e.target.value)
+            commitDay(e.target.value)
+          }}
         />
         {!member.auth_user_id && <Badge tone="warning">אין חשבון מקושר</Badge>}
         {!member.is_active && <Badge tone="warning">לא פעיל</Badge>}
