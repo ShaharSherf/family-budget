@@ -33,6 +33,7 @@ function MemberRow({ member }: { member: FamilyMember }) {
             commitName(e.target.value)
           }}
         />
+        <span className="whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">חודש יומולדת</span>
         <Select
           value={member.birthday_month ? String(member.birthday_month) : NO_BIRTHDAY}
           onValueChange={(value) =>
