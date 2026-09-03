@@ -22,3 +22,10 @@ const monthLabelFormatter = new Intl.DateTimeFormat('he-IL', { month: 'long', ye
 export function formatMonthLabel(monthKey: string): string {
   return monthLabelFormatter.format(new Date(`${monthKey}-01T00:00:00`))
 }
+
+const monthOfYearFormatter = new Intl.DateTimeFormat('he-IL', { month: 'long' })
+
+/** `month` is 1-12, with no particular year — for calendar-recurring things like a birthday. */
+export function formatMonthOfYear(month: number): string {
+  return monthOfYearFormatter.format(new Date(2000, month - 1, 1))
+}

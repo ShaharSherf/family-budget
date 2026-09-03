@@ -8,6 +8,7 @@ import { computeSavingsTotals, computeTotals, groupByCategory } from './utils'
 import { MonthPicker } from './components/MonthPicker'
 import { BudgetActualSummary } from './components/BudgetActualSummary'
 import { CloseMonthToggle } from './components/CloseMonthToggle'
+import { MonthAnnotations } from './components/MonthAnnotations'
 import { MonthlyTable } from './components/MonthlyTable'
 import { SavingsSection } from './components/SavingsSection'
 import { ChartCard } from '@/components/charts/ChartCard'
@@ -51,6 +52,8 @@ export function MonthlyReviewPage() {
         <MonthPicker monthKey={monthKey} />
         <CloseMonthToggle monthKey={monthKey} />
       </div>
+
+      {month && <MonthAnnotations key={monthKey} monthKey={monthKey} notes={month.notes} readOnly={readOnly} />}
 
       <BudgetActualSummary totals={totals} savings={savingsTotals} />
 

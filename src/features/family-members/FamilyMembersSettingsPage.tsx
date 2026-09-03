@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import { useCreateFamilyMember, useFamilyMembers, useUpdateFamilyMember } from './useFamilyMembers'
 import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
+import { formatMonthOfYear } from '@/lib/format'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { Select } from '@/components/ui/Select'
 import type { FamilyMember } from '@/lib/supabase/queries/familyMembers'
+
+const NO_BIRTHDAY = 'none'
+const BIRTHDAY_MONTH_OPTIONS = [
+  { value: NO_BIRTHDAY, label: 'אין' },
+  ...Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1), label: formatMonthOfYear(i + 1) })),
+]
 
 function MemberRow({ member }: { member: FamilyMember }) {
   const updateMember = useUpdateFamilyMember()
@@ -24,6 +32,17 @@ function MemberRow({ member }: { member: FamilyMember }) {
             setName(e.target.value)
             commitName(e.target.value)
           }}
+        />
+        <Select
+          value={member.birthday_month ? String(member.birthday_month) : NO_BIRTHDAY}
+          onValueChange={(value) =>
+            updateMember.mutate({
+              id: member.id,
+              patch: { birthday_month: value === NO_BIRTHDAY ? null : Number(value) },
+            })
+          }
+          options={BIRTHDAY_MONTH_OPTIONS}
+          placeholder="חודש יומולדת"
         />
         {!member.auth_user_id && <Badge tone="warning">אין חשבון מקושר</Badge>}
         {!member.is_active && <Badge tone="warning">לא פעיל</Badge>}

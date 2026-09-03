@@ -36,3 +36,14 @@ export async function setMonthClosed(monthKey: string, isClosed: boolean): Promi
   if (error) throw error
   return data
 }
+
+export async function setMonthNotes(monthKey: string, notes: string): Promise<Month> {
+  const { data, error } = await supabase
+    .from('months')
+    .update({ notes: notes.trim() === '' ? null : notes })
+    .eq('month_key', toMonthDate(monthKey))
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}

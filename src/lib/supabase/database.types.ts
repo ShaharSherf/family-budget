@@ -14,6 +14,7 @@ export interface Database {
           id: string
           display_name: string
           auth_user_id: string | null
+          birthday_month: number | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -22,6 +23,7 @@ export interface Database {
           id?: string
           display_name: string
           auth_user_id?: string | null
+          birthday_month?: number | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -85,6 +87,7 @@ export interface Database {
           closed_by: string | null
           last_unlocked_at: string | null
           last_unlocked_by: string | null
+          notes: string | null
           created_at: string
         }
         Insert: {
@@ -94,6 +97,7 @@ export interface Database {
           closed_by?: string | null
           last_unlocked_at?: string | null
           last_unlocked_by?: string | null
+          notes?: string | null
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['months']['Insert']>
