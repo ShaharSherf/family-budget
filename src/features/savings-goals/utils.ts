@@ -22,6 +22,26 @@ export interface GoalMonthBalance {
  * the balance is just carried forward (previous + this month's deposit),
  * with market return left unknown for that month rather than assumed zero.
  */
+/**
+ * A "nice" round step size derived from the balance's own order of
+ * magnitude (the 1-2-5-10 ladder used for chart tick spacing) — e.g. ~213k
+ * gets 200k steps, ~1.3M gets 1M steps. Scales itself up as the balance
+ * grows, so a "just keep growing" goal never needs a manually-chosen step.
+ */
+function niceStep(value: number): number {
+  if (value <= 0) return 100_000
+  const magnitude = 10 ** Math.floor(Math.log10(value))
+  const normalized = value / magnitude
+  const niceMultiplier = normalized < 2 ? 1 : normalized < 5 ? 2 : 5
+  return niceMultiplier * magnitude
+}
+
+/** The next unreached milestone above `currentBalance`, on an auto-scaling round-number ladder. */
+export function nextIntervalMilestone(currentBalance: number): number {
+  const step = niceStep(Math.max(currentBalance, 1))
+  return (Math.floor(currentBalance / step) + 1) * step
+}
+
 export function computeGoalMonthBalances(
   openingBalance: number,
   contributions: Tables<'savings_contributions'>[],

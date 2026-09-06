@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Toggle } from '@/components/ui/Toggle'
 import { useUpdateSavingsGoal } from '../hooks/useSavingsGoals'
-import { computeGoalMonthBalances } from '../utils'
+import { computeGoalMonthBalances, nextIntervalMilestone } from '../utils'
 import type { SavingsGoal, SavingsContribution } from '@/lib/supabase/queries/savingsGoals'
 
 function ProgressBar({ value, max }: { value: number; max: number | null }) {
@@ -33,7 +33,6 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
   const [name, setName] = useState(goal.name)
   const [monthlyTarget, setMonthlyTarget] = useState(goal.monthly_target_amount?.toString() ?? '')
   const [lifetimeTarget, setLifetimeTarget] = useState(goal.lifetime_target_amount?.toString() ?? '')
-  const [stepAmount, setStepAmount] = useState(goal.interval_step_amount?.toString() ?? '')
 
   const commitName = useDebouncedCallback((value: string) => {
     if (!value.trim() || value === goal.name) return
@@ -52,12 +51,6 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
     updateGoal.mutate({ id: goal.id, patch: { lifetime_target_amount: n } })
   }, 500)
 
-  const commitStepAmount = useDebouncedCallback((value: string) => {
-    const n = value === '' ? null : Number(value)
-    if (n !== null && (!Number.isFinite(n) || n <= 0)) return
-    updateGoal.mutate({ id: goal.id, patch: { interval_step_amount: n } })
-  }, 500)
-
   const monthBalances = useMemo(
     () => computeGoalMonthBalances(goal.opening_balance_amount, contributions),
     [goal.opening_balance_amount, contributions],
@@ -70,12 +63,10 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
 
   const isInterval = goal.target_mode === 'interval'
   // The step ladder never shows future milestones — just recomputes the
-  // next unreached one above the current balance, so crossing a milestone
-  // silently re-targets the card instead of needing to "unlock" anything.
-  const nextMilestone =
-    isInterval && goal.interval_step_amount
-      ? (Math.floor(currentBalance / goal.interval_step_amount) + 1) * goal.interval_step_amount
-      : null
+  // next unreached round-number milestone above the current balance (the
+  // step size auto-scales with the balance), so crossing one silently
+  // re-targets the card instead of needing a manually-chosen step size.
+  const nextMilestone = isInterval ? nextIntervalMilestone(currentBalance) : null
   const effectiveTarget = isInterval ? nextMilestone : goal.lifetime_target_amount
   const remainingToGoal = effectiveTarget !== null ? effectiveTarget - currentBalance : null
 
@@ -130,15 +121,7 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
           <span className="flex items-center gap-1">
             {formatILS(currentBalance)} /
             {isInterval ? (
-              <NumberInput
-                className="w-24"
-                placeholder="קפיצות של"
-                value={stepAmount}
-                onChange={(e) => {
-                  setStepAmount(e.target.value)
-                  commitStepAmount(e.target.value)
-                }}
-              />
+              <span className="text-gray-700 dark:text-gray-300">{formatILS(nextMilestone)}</span>
             ) : (
               <NumberInput
                 className="w-24"
