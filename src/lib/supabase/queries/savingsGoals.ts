@@ -23,6 +23,14 @@ export async function updateSavingsGoal(id: string, patch: TablesUpdate<'savings
   return data
 }
 
+/** Deletes the goal's own contribution history first — `savings_contributions.goal_id` is ON DELETE RESTRICT. */
+export async function deleteSavingsGoal(id: string): Promise<void> {
+  const { error: contributionsError } = await supabase.from('savings_contributions').delete().eq('goal_id', id)
+  if (contributionsError) throw contributionsError
+  const { error } = await supabase.from('savings_goals').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function getContributionsForGoal(goalId: string): Promise<SavingsContribution[]> {
   const { data, error } = await supabase
     .from('savings_contributions')

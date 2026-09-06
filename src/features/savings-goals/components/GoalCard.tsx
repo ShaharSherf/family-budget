@@ -8,7 +8,7 @@ import { Input, NumberInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Toggle } from '@/components/ui/Toggle'
-import { useUpdateSavingsGoal } from '../hooks/useSavingsGoals'
+import { useDeleteSavingsGoal, useUpdateSavingsGoal } from '../hooks/useSavingsGoals'
 import { computeGoalMonthBalances, nextIntervalMilestone } from '../utils'
 import type { SavingsGoal, SavingsContribution } from '@/lib/supabase/queries/savingsGoals'
 
@@ -30,6 +30,8 @@ function ProgressBar({ value, max }: { value: number; max: number | null }) {
 
 export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contributions: SavingsContribution[] }) {
   const updateGoal = useUpdateSavingsGoal()
+  const deleteGoal = useDeleteSavingsGoal()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [name, setName] = useState(goal.name)
   const [monthlyTarget, setMonthlyTarget] = useState(goal.monthly_target_amount?.toString() ?? '')
   const [lifetimeTarget, setLifetimeTarget] = useState(goal.lifetime_target_amount?.toString() ?? '')
@@ -90,7 +92,27 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
         >
           {goal.is_active ? 'השבתה' : 'הפעלה'}
         </Button>
+        {confirmingDelete ? (
+          <>
+            <span className="text-xs text-gray-500 dark:text-gray-400">למחוק לצמיתות את ההיסטוריה?</span>
+            <Button variant="danger" onClick={() => deleteGoal.mutate(goal.id)}>
+              כן, מחיקה
+            </Button>
+            <Button variant="ghost" onClick={() => setConfirmingDelete(false)}>
+              ביטול
+            </Button>
+          </>
+        ) : (
+          <Button variant="ghost" onClick={() => setConfirmingDelete(true)}>
+            מחיקת יעד
+          </Button>
+        )}
       </div>
+      {deleteGoal.isError && (
+        <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+          מחיקה נכשלה — ייתכן שיש נתונים בחודש נעול. יש לבטל נעילה ולנסות שוב.
+        </p>
+      )}
 
       <div className="mt-2">
         <Toggle

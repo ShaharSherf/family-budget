@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createSavingsGoal,
+  deleteSavingsGoal,
   getAllContributions,
   getContributionsForGoal,
   getContributionsForMonth,
@@ -45,6 +46,17 @@ export function useUpdateSavingsGoal() {
     mutationFn: (vars: { id: string; patch: TablesUpdate<'savings_goals'> }) =>
       updateSavingsGoal(vars.id, vars.patch),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
+  })
+}
+
+export function useDeleteSavingsGoal() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteSavingsGoal(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals })
+      queryClient.invalidateQueries({ queryKey: queryKeys.allSavingsContributions })
+    },
   })
 }
 
