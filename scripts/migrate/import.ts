@@ -263,23 +263,11 @@ async function main() {
 
   // ── Step 9: the orphaned hardcoded pension formula -> a real goal ───────
 
-  const { data: pensionGoal, error: pensionGoalError } = await supabase
-    .from('savings_goals')
-    .insert({
-      name: PENSION_GOAL_NAME,
-      notes: 'Opening balance carried over from the legacy spreadsheet, where it was previously a hardcoded formula disconnected from any monthly sheet.',
-    })
-    .select('id')
-    .single()
-  if (pensionGoalError) throw pensionGoalError
-
-  const { error: pensionContributionError } = await supabase.from('savings_contributions').insert({
-    goal_id: pensionGoal.id,
-    month_key: toMonthDate(ACTUALS_MONTH_KEY),
-    contributed_amount: LEGACY_PENSION_OPENING_BALANCE,
-    notes: 'Legacy opening balance (see goal notes).',
+  const { error: pensionGoalError } = await supabase.from('savings_goals').insert({
+    name: PENSION_GOAL_NAME,
+    opening_balance_amount: LEGACY_PENSION_OPENING_BALANCE,
   })
-  if (pensionContributionError) throw pensionContributionError
+  if (pensionGoalError) throw pensionGoalError
   console.log('Migrated pension into a proper savings_goals row.')
 
   // ── Step 10: the other 3 savings goals, with August targets/actuals ─────
