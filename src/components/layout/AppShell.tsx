@@ -5,7 +5,7 @@ import { currentMonthKey } from '@/lib/month'
 import { getLastViewedMonth } from '@/lib/lastViewedMonth'
 import { setCatBackgroundEnabled, useCatBackgroundEnabled } from '@/lib/catBackgroundPreference'
 import { cn } from '@/lib/cn'
-import { Toggle } from '@/components/ui/Toggle'
+import { Button } from '@/components/ui/Button'
 import { LogoutIcon } from '@/components/ui/icons'
 
 const STATIC_NAV_ITEMS = [
@@ -64,10 +64,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
-              <span>שינוי רקע</span>
-              <Toggle pressed={catsEnabled} onPressedChange={setCatBackgroundEnabled} label="שינוי רקע" />
-            </div>
+            <Button
+              variant={catsEnabled ? 'primary' : 'secondary'}
+              onClick={() => setCatBackgroundEnabled(!catsEnabled)}
+            >
+              שינוי רקע
+            </Button>
             <button
               onClick={() => supabase.auth.signOut()}
               title="התנתקות"

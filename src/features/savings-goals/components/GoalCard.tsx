@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { formatILS, formatMonthLabel } from '@/lib/format'
 import { fromMonthDate } from '@/lib/month'
-import { chrome } from '@/components/charts/chartTheme'
+import { status } from '@/components/charts/chartTheme'
 import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
 import { Input, NumberInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
@@ -13,6 +13,12 @@ import { useDeleteSavingsGoal, useUpdateSavingsGoal } from '../hooks/useSavingsG
 import { computeGoalMonthBalances, nextIntervalMilestone } from '../utils'
 import type { SavingsGoal, SavingsContribution } from '@/lib/supabase/queries/savingsGoals'
 
+function progressColor(pct: number): string {
+  if (pct < 33) return status.critical
+  if (pct < 66) return status.warning
+  return status.good
+}
+
 function ProgressBar({ value, max }: { value: number; max: number | null }) {
   const rawPct = max && max > 0 ? (value / max) * 100 : 0
   const pct = Math.min(100, rawPct)
@@ -21,10 +27,7 @@ function ProgressBar({ value, max }: { value: number; max: number | null }) {
       className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800"
       title={`${Math.round(rawPct)}%`}
     >
-      <div
-        className="h-2 rounded-full"
-        style={{ width: `${pct}%`, background: 'var(--series-1)', borderColor: chrome.gridline }}
-      />
+      <div className="h-2 rounded-full transition-colors" style={{ width: `${pct}%`, background: progressColor(pct) }} />
     </div>
   )
 }
