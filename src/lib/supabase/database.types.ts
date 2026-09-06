@@ -156,6 +156,8 @@ export interface Database {
           name: string
           monthly_target_amount: number | null
           lifetime_target_amount: number | null
+          target_mode: 'fixed' | 'interval'
+          interval_step_amount: number | null
           opening_balance_amount: number
           is_active: boolean
           notes: string | null
@@ -167,6 +169,8 @@ export interface Database {
           name: string
           monthly_target_amount?: number | null
           lifetime_target_amount?: number | null
+          target_mode?: 'fixed' | 'interval'
+          interval_step_amount?: number | null
           opening_balance_amount?: number
           is_active?: boolean
           notes?: string | null

@@ -7,6 +7,7 @@ import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
 import { Input, NumberInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { Toggle } from '@/components/ui/Toggle'
 import { useUpdateSavingsGoal } from '../hooks/useSavingsGoals'
 import { computeGoalMonthBalances } from '../utils'
 import type { SavingsGoal, SavingsContribution } from '@/lib/supabase/queries/savingsGoals'
@@ -32,6 +33,7 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
   const [name, setName] = useState(goal.name)
   const [monthlyTarget, setMonthlyTarget] = useState(goal.monthly_target_amount?.toString() ?? '')
   const [lifetimeTarget, setLifetimeTarget] = useState(goal.lifetime_target_amount?.toString() ?? '')
+  const [stepAmount, setStepAmount] = useState(goal.interval_step_amount?.toString() ?? '')
 
   const commitName = useDebouncedCallback((value: string) => {
     if (!value.trim() || value === goal.name) return
@@ -50,6 +52,12 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
     updateGoal.mutate({ id: goal.id, patch: { lifetime_target_amount: n } })
   }, 500)
 
+  const commitStepAmount = useDebouncedCallback((value: string) => {
+    const n = value === '' ? null : Number(value)
+    if (n !== null && (!Number.isFinite(n) || n <= 0)) return
+    updateGoal.mutate({ id: goal.id, patch: { interval_step_amount: n } })
+  }, 500)
+
   const monthBalances = useMemo(
     () => computeGoalMonthBalances(goal.opening_balance_amount, contributions),
     [goal.opening_balance_amount, contributions],
@@ -59,8 +67,17 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
   // back to the opening balance for a goal with no monthly data at all yet.
   const latest = monthBalances[monthBalances.length - 1]
   const currentBalance = latest?.cumulativeBalance ?? goal.opening_balance_amount
-  const remainingToGoal =
-    goal.lifetime_target_amount !== null ? goal.lifetime_target_amount - currentBalance : null
+
+  const isInterval = goal.target_mode === 'interval'
+  // The step ladder never shows future milestones — just recomputes the
+  // next unreached one above the current balance, so crossing a milestone
+  // silently re-targets the card instead of needing to "unlock" anything.
+  const nextMilestone =
+    isInterval && goal.interval_step_amount
+      ? (Math.floor(currentBalance / goal.interval_step_amount) + 1) * goal.interval_step_amount
+      : null
+  const effectiveTarget = isInterval ? nextMilestone : goal.lifetime_target_amount
+  const remainingToGoal = effectiveTarget !== null ? effectiveTarget - currentBalance : null
 
   const history = [...monthBalances].reverse()
 
@@ -84,6 +101,16 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
         </Button>
       </div>
 
+      <div className="mt-2">
+        <Toggle
+          pressed={isInterval}
+          onPressedChange={(pressed) =>
+            updateGoal.mutate({ id: goal.id, patch: { target_mode: pressed ? 'interval' : 'fixed' } })
+          }
+          label="יעד מדורג"
+        />
+      </div>
+
       <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
         <span>יעד חודשי</span>
         <NumberInput
@@ -102,21 +129,37 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
           <span>יתרה נוכחית</span>
           <span className="flex items-center gap-1">
             {formatILS(currentBalance)} /
-            <NumberInput
-              className="w-24"
-              placeholder="יעד כללי"
-              value={lifetimeTarget}
-              onChange={(e) => {
-                setLifetimeTarget(e.target.value)
-                commitLifetimeTarget(e.target.value)
-              }}
-            />
+            {isInterval ? (
+              <NumberInput
+                className="w-24"
+                placeholder="קפיצות של"
+                value={stepAmount}
+                onChange={(e) => {
+                  setStepAmount(e.target.value)
+                  commitStepAmount(e.target.value)
+                }}
+              />
+            ) : (
+              <NumberInput
+                className="w-24"
+                placeholder="יעד כללי"
+                value={lifetimeTarget}
+                onChange={(e) => {
+                  setLifetimeTarget(e.target.value)
+                  commitLifetimeTarget(e.target.value)
+                }}
+              />
+            )}
           </span>
         </div>
-        <ProgressBar value={currentBalance} max={goal.lifetime_target_amount} />
+        <ProgressBar value={currentBalance} max={effectiveTarget} />
         {remainingToGoal !== null && (
           <div className="text-xs text-gray-400 dark:text-gray-500">
-            {remainingToGoal <= 0 ? 'היעד הושג! 🎉' : `נותר להשלמת היעד: ${formatILS(remainingToGoal)}`}
+            {isInterval
+              ? `נותר ליעד הביניים הבא (${formatILS(nextMilestone)}): ${formatILS(remainingToGoal)}`
+              : remainingToGoal <= 0
+                ? 'היעד הושג! 🎉'
+                : `נותר להשלמת היעד: ${formatILS(remainingToGoal)}`}
           </div>
         )}
       </div>
