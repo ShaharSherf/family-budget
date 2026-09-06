@@ -6,6 +6,7 @@ import { getLastViewedMonth } from '@/lib/lastViewedMonth'
 import { setCatBackgroundEnabled, useCatBackgroundEnabled } from '@/lib/catBackgroundPreference'
 import { cn } from '@/lib/cn'
 import { Toggle } from '@/components/ui/Toggle'
+import { LogoutIcon } from '@/components/ui/icons'
 
 const STATIC_NAV_ITEMS = [
   { to: '/analytics', label: 'ניתוח ומגמות', match: '/analytics' },
@@ -63,12 +64,17 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <Toggle pressed={catsEnabled} onPressedChange={setCatBackgroundEnabled} label="שינוי רקע" />
+            <div className="flex items-center gap-1.5">
+              <span aria-hidden>🐱</span>
+              <Toggle pressed={catsEnabled} onPressedChange={setCatBackgroundEnabled} label="שינוי רקע" />
+            </div>
             <button
               onClick={() => supabase.auth.signOut()}
-              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              title="התנתקות"
+              aria-label="התנתקות"
+              className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
             >
-              התנתקות
+              <LogoutIcon className="rtl:scale-x-[-1]" />
             </button>
           </div>
         </div>

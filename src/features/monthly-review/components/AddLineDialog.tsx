@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Dialog } from '@/components/ui/Dialog'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
+import { PlusIcon } from '@/components/ui/icons'
 import { useCategories, useDetails } from '@/features/categories/useCategories'
 import { useCreateBudgetLine } from '../hooks/useBudgetLineMutations'
 import { toMonthDate } from '@/lib/month'
@@ -45,8 +46,8 @@ export function AddLineDialog({ monthKey, open, onOpenChange }: { monthKey: stri
           placeholder="פירוט"
           options={detailOptions}
         />
-        <Button onClick={handleAdd} disabled={!categoryId || !detailId}>
-          הוספה
+        <Button title="הוספה" aria-label="הוספה" onClick={handleAdd} disabled={!categoryId || !detailId}>
+          <PlusIcon />
         </Button>
       </div>
     </Dialog>

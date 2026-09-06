@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
+import { Toggle } from '@/components/ui/Toggle'
+import { PlusIcon } from '@/components/ui/icons'
 
 export function CategoriesSettingsPage() {
   const { data: categories = [] } = useCategories()
@@ -32,13 +34,15 @@ export function CategoriesSettingsPage() {
           ]}
         />
         <Button
+          title="הוספת קטגוריה"
+          aria-label="הוספת קטגוריה"
           onClick={() => {
             if (!newCategoryName.trim()) return
             createCategory.mutate({ name_he: newCategoryName.trim(), kind: newCategoryKind })
             setNewCategoryName('')
           }}
         >
-          הוספת קטגוריה
+          <PlusIcon />
         </Button>
       </div>
 
@@ -53,12 +57,11 @@ export function CategoriesSettingsPage() {
                 </Badge>
                 {!category.is_active && <Badge tone="warning">לא פעיל</Badge>}
               </div>
-              <Button
-                variant="ghost"
-                onClick={() => updateCategory.mutate({ id: category.id, patch: { is_active: !category.is_active } })}
-              >
-                {category.is_active ? 'השבתה' : 'הפעלה'}
-              </Button>
+              <Toggle
+                pressed={category.is_active}
+                onPressedChange={(pressed) => updateCategory.mutate({ id: category.id, patch: { is_active: pressed } })}
+                label={category.is_active ? 'פעיל — לחיצה להשבתה' : 'לא פעיל — לחיצה להפעלה'}
+              />
             </div>
 
             <ul className="mt-2 flex flex-wrap gap-1.5">
@@ -85,6 +88,8 @@ export function CategoriesSettingsPage() {
               />
               <Button
                 variant="secondary"
+                title="הוספה"
+                aria-label="הוספה"
                 onClick={() => {
                   const name = newDetailByCategory[category.id]?.trim()
                   if (!name) return
@@ -92,7 +97,7 @@ export function CategoriesSettingsPage() {
                   setNewDetailByCategory((prev) => ({ ...prev, [category.id]: '' }))
                 }}
               >
-                הוספה
+                <PlusIcon />
               </Button>
             </div>
           </div>

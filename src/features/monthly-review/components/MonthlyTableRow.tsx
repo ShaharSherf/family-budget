@@ -3,6 +3,7 @@ import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
 import { formatILS } from '@/lib/format'
 import { NumberInput, Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { TrashIcon } from '@/components/ui/icons'
 import { useDeleteBudgetLine, useUpdateBudgetLine } from '../hooks/useBudgetLineMutations'
 import { WhoPaidCell } from './WhoPaidCell'
 import type { BudgetLineWithRelations } from '@/types/domain'
@@ -116,8 +117,8 @@ export function MonthlyTableRow({
       </td>
       <td className="px-2 py-1.5">
         {!readOnly && (
-          <Button variant="ghost" onClick={() => remove.mutate(row.id)}>
-            ✕
+          <Button variant="ghost" title="מחיקה" aria-label="מחיקה" onClick={() => remove.mutate(row.id)}>
+            <TrashIcon />
           </Button>
         )}
       </td>

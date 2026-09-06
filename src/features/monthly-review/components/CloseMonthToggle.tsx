@@ -9,11 +9,14 @@ export function CloseMonthToggle({ monthKey }: { monthKey: string }) {
   if (!month) return null
 
   return (
-    <Toggle
-      pressed={month.is_closed}
-      onPressedChange={(pressed) => setClosed.mutate(pressed)}
-      label={month.is_closed ? 'החודש נעול — פתיחה' : 'נעילת החודש'}
-      pressedIcon={<LockIcon />}
-    />
+    <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+      {month.is_closed && <LockIcon />}
+      <span>{month.is_closed ? 'החודש נעול' : 'נעילת החודש'}</span>
+      <Toggle
+        pressed={month.is_closed}
+        onPressedChange={(pressed) => setClosed.mutate(pressed)}
+        label={month.is_closed ? 'החודש נעול — לחיצה לפתיחה' : 'לחיצה לנעילת החודש'}
+      />
+    </div>
   )
 }

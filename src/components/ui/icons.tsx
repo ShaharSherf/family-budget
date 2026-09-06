@@ -24,6 +24,42 @@ export function ChevronEnd(props: SVGProps<SVGSVGElement>) {
   )
 }
 
+export function PlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>
+      <path d="M7 2.5V11.5M2.5 7H11.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function TrashIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>
+      <path
+        d="M2.5 4H11.5M5.5 4V2.5H8.5V4M5.5 6.5V10M8.5 6.5V10M3.5 4L4 11.5H10L10.5 4"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+export function LogoutIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>
+      <path
+        d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3M9.5 9.5 12 7l-2.5-2.5M12 7H5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 export function XIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>

@@ -3,6 +3,7 @@ import { useAllContributions, useCreateSavingsGoal, useSavingsGoals } from './ho
 import { GoalCard } from './components/GoalCard'
 import { Input, NumberInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { PlusIcon } from '@/components/ui/icons'
 
 export function SavingsGoalsPage() {
   const { data: goals = [] } = useSavingsGoals()
@@ -28,6 +29,8 @@ export function SavingsGoalsPage() {
         <NumberInput placeholder="יעד חודשי" value={monthlyTarget} onChange={(e) => setMonthlyTarget(e.target.value)} />
         <NumberInput placeholder="יעד כללי" value={lifetimeTarget} onChange={(e) => setLifetimeTarget(e.target.value)} />
         <Button
+          title="הוספת יעד"
+          aria-label="הוספת יעד"
           onClick={() => {
             if (!name.trim()) return
             create.mutate({
@@ -40,7 +43,7 @@ export function SavingsGoalsPage() {
             setLifetimeTarget('')
           }}
         >
-          הוספת יעד
+          <PlusIcon />
         </Button>
       </div>
     </div>

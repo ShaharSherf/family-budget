@@ -1,31 +1,30 @@
-import type { ReactNode } from 'react'
 import * as RadixToggle from '@radix-ui/react-toggle'
 import { cn } from '@/lib/cn'
 
 interface ToggleProps {
   pressed: boolean
   onPressedChange: (pressed: boolean) => void
+  /** Accessible name and hover tooltip — this is a bare switch with no visible text of its own; pair it with your own label if one should show. */
   label: string
-  /** Shown before the label only while pressed — e.g. a lock icon for a "closed month" toggle. */
-  pressedIcon?: ReactNode
   className?: string
 }
 
-export function Toggle({ pressed, onPressedChange, label, pressedIcon, className }: ToggleProps) {
+/** A real sliding switch track. justify-start/end (not left/right) is what
+ * keeps the knob on the correct side in RTL without any transform hacks. */
+export function Toggle({ pressed, onPressedChange, label, className }: ToggleProps) {
   return (
     <RadixToggle.Root
       pressed={pressed}
       onPressedChange={onPressedChange}
+      aria-label={label}
+      title={label}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-sm font-medium transition-colors',
-        pressed
-          ? 'border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
-          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300',
+        'inline-flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors',
+        pressed ? 'justify-end bg-blue-600' : 'justify-start bg-gray-300 dark:bg-gray-600',
         className,
       )}
     >
-      {pressed && pressedIcon}
-      {label}
+      <span className="h-5 w-5 rounded-full bg-white shadow" />
     </RadixToggle.Root>
   )
 }

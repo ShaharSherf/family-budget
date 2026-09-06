@@ -9,7 +9,7 @@ import { addMonths, currentMonthKey } from '@/lib/month'
 import { getLastViewedCalendarMonth, setLastViewedCalendarMonth } from '@/lib/lastViewedMonth'
 import { formatMonthLabel, formatMonthOfYear } from '@/lib/format'
 import { cn } from '@/lib/cn'
-import { ChevronEnd, ChevronStart } from '@/components/ui/icons'
+import { CheckIcon, ChevronEnd, ChevronStart, TrashIcon } from '@/components/ui/icons'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
@@ -113,15 +113,17 @@ function EventDialog({ state, onClose }: { state: DialogState; onClose: () => vo
           {target.mode === 'edit' ? (
             <Button
               variant="danger"
+              title="מחיקה"
+              aria-label="מחיקה"
               onClick={() => deleteEvent.mutate(target.event.id, { onSuccess: onClose })}
             >
-              מחיקה
+              <TrashIcon />
             </Button>
           ) : (
             <span />
           )}
-          <Button onClick={handleSave} disabled={!title.trim()}>
-            שמירה
+          <Button title="שמירה" aria-label="שמירה" onClick={handleSave} disabled={!title.trim()}>
+            <CheckIcon />
           </Button>
         </div>
       </div>

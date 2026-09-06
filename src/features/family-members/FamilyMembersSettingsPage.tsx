@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Select } from '@/components/ui/Select'
+import { Toggle } from '@/components/ui/Toggle'
+import { PlusIcon } from '@/components/ui/icons'
 import type { FamilyMember } from '@/lib/supabase/queries/familyMembers'
 
 const NO_BIRTHDAY = 'none'
@@ -67,12 +69,11 @@ function MemberRow({ member }: { member: FamilyMember }) {
         {!member.auth_user_id && <Badge tone="warning">אין חשבון מקושר</Badge>}
         {!member.is_active && <Badge tone="warning">לא פעיל</Badge>}
       </div>
-      <Button
-        variant="ghost"
-        onClick={() => updateMember.mutate({ id: member.id, patch: { is_active: !member.is_active } })}
-      >
-        {member.is_active ? 'השבתה' : 'הפעלה'}
-      </Button>
+      <Toggle
+        pressed={member.is_active}
+        onPressedChange={(pressed) => updateMember.mutate({ id: member.id, patch: { is_active: pressed } })}
+        label={member.is_active ? 'פעיל — לחיצה להשבתה' : 'לא פעיל — לחיצה להפעלה'}
+      />
     </div>
   )
 }
@@ -95,13 +96,15 @@ export function FamilyMembersSettingsPage() {
       <div className="flex items-end gap-2 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
         <Input placeholder="שם" value={newName} onChange={(e) => setNewName(e.target.value)} />
         <Button
+          title="הוספה"
+          aria-label="הוספה"
           onClick={() => {
             if (!newName.trim()) return
             createMember.mutate({ display_name: newName.trim() })
             setNewName('')
           }}
         >
-          הוספה
+          <PlusIcon />
         </Button>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react'
 import { formatILS } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/ui/Button'
+import { PlusIcon } from '@/components/ui/icons'
 import { MonthlyTableRow } from './MonthlyTableRow'
 import { AddLineDialog } from './AddLineDialog'
 import type { CategoryGroup } from '../utils'
@@ -70,8 +71,14 @@ export function MonthlyTable({
         </table>
       </div>
       {!readOnly && (
-        <Button variant="secondary" className="mt-3" onClick={() => setAddDialogOpen(true)}>
-          + הוספת שורה
+        <Button
+          variant="secondary"
+          className="mt-3"
+          title="הוספת שורה"
+          aria-label="הוספת שורה"
+          onClick={() => setAddDialogOpen(true)}
+        >
+          <PlusIcon />
         </Button>
       )}
       <AddLineDialog monthKey={monthKey} open={addDialogOpen} onOpenChange={setAddDialogOpen} />

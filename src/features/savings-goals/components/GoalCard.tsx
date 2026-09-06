@@ -8,6 +8,7 @@ import { Input, NumberInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Toggle } from '@/components/ui/Toggle'
+import { TrashIcon, XIcon } from '@/components/ui/icons'
 import { useDeleteSavingsGoal, useUpdateSavingsGoal } from '../hooks/useSavingsGoals'
 import { computeGoalMonthBalances, nextIntervalMilestone } from '../utils'
 import type { SavingsGoal, SavingsContribution } from '@/lib/supabase/queries/savingsGoals'
@@ -86,25 +87,39 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
           className="font-semibold"
         />
         {!goal.is_active && <Badge tone="warning">לא פעיל</Badge>}
-        <Button
-          variant="ghost"
-          onClick={() => updateGoal.mutate({ id: goal.id, patch: { is_active: !goal.is_active } })}
-        >
-          {goal.is_active ? 'השבתה' : 'הפעלה'}
-        </Button>
+        <Toggle
+          pressed={goal.is_active}
+          onPressedChange={(pressed) => updateGoal.mutate({ id: goal.id, patch: { is_active: pressed } })}
+          label={goal.is_active ? 'פעיל — לחיצה להשבתה' : 'לא פעיל — לחיצה להפעלה'}
+        />
         {confirmingDelete ? (
           <>
             <span className="text-xs text-gray-500 dark:text-gray-400">למחוק לצמיתות את ההיסטוריה?</span>
-            <Button variant="danger" onClick={() => deleteGoal.mutate(goal.id)}>
-              כן, מחיקה
+            <Button
+              variant="danger"
+              title="כן, מחיקה"
+              aria-label="כן, מחיקה"
+              onClick={() => deleteGoal.mutate(goal.id)}
+            >
+              <TrashIcon />
             </Button>
-            <Button variant="ghost" onClick={() => setConfirmingDelete(false)}>
-              ביטול
+            <Button
+              variant="ghost"
+              title="ביטול"
+              aria-label="ביטול"
+              onClick={() => setConfirmingDelete(false)}
+            >
+              <XIcon />
             </Button>
           </>
         ) : (
-          <Button variant="ghost" onClick={() => setConfirmingDelete(true)}>
-            מחיקת יעד
+          <Button
+            variant="ghost"
+            title="מחיקת יעד"
+            aria-label="מחיקת יעד"
+            onClick={() => setConfirmingDelete(true)}
+          >
+            <TrashIcon />
           </Button>
         )}
       </div>
@@ -114,7 +129,8 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
         </p>
       )}
 
-      <div className="mt-2">
+      <div className="mt-2 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <span>יעד מדורג</span>
         <Toggle
           pressed={isInterval}
           onPressedChange={(pressed) =>
