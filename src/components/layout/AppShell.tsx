@@ -64,8 +64,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <span aria-hidden>🐱</span>
+            <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+              <span>שינוי רקע</span>
               <Toggle pressed={catsEnabled} onPressedChange={setCatBackgroundEnabled} label="שינוי רקע" />
             </div>
             <button

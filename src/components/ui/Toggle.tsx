@@ -20,7 +20,7 @@ export function Toggle({ pressed, onPressedChange, label, className }: TogglePro
       title={label}
       className={cn(
         'inline-flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors',
-        pressed ? 'justify-end bg-blue-600' : 'justify-start bg-gray-300 dark:bg-gray-600',
+        pressed ? 'justify-end bg-green-600' : 'justify-start bg-red-500 dark:bg-red-600',
         className,
       )}
     >
