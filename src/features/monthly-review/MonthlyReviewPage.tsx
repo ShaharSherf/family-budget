@@ -61,9 +61,9 @@ export function MonthlyReviewPage() {
         <p className="text-sm text-gray-400">טוען...</p>
       ) : (
         <>
-          <MonthlyTable groups={incomeGroups} monthKey={monthKey} readOnly={readOnly} />
+          <MonthlyTable groups={incomeGroups} kind="income" monthKey={monthKey} readOnly={readOnly} />
           <SavingsSection monthKey={monthKey} readOnly={readOnly} />
-          <MonthlyTable groups={expenseGroups} monthKey={monthKey} readOnly={readOnly} />
+          <MonthlyTable groups={expenseGroups} kind="expense" monthKey={monthKey} readOnly={readOnly} />
         </>
       )}
 

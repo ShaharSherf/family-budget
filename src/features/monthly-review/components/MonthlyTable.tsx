@@ -16,18 +16,24 @@ function groupTotalColor(group: CategoryGroup): string {
   return 'text-gray-800 dark:text-gray-200'
 }
 
-const HEADERS = ['פירוט', 'מי שילם', 'בפועל', 'תקציב', '% עלינו', 'משפחתי', 'נותר', 'הערות', '']
+function getHeaders(kind: 'income' | 'expense'): string[] {
+  const whoLabel = kind === 'income' ? 'מי הרוויח' : 'מי שילם'
+  return ['פירוט', whoLabel, 'בפועל', 'תקציב', '% עלינו', 'משפחתי', 'נותר', 'הערות', '']
+}
 
 export function MonthlyTable({
   groups,
+  kind,
   monthKey,
   readOnly,
 }: {
   groups: CategoryGroup[]
+  kind: 'income' | 'expense'
   monthKey: string
   readOnly: boolean
 }) {
   const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const headers = getHeaders(kind)
 
   return (
     <div>
@@ -35,7 +41,7 @@ export function MonthlyTable({
         <table className="w-full text-start">
           <thead>
             <tr>
-              {HEADERS.map((h) => (
+              {headers.map((h) => (
                 <th
                   key={h}
                   className="sticky top-[57px] z-[5] bg-gray-50 px-2 py-1.5 text-start text-xs font-medium text-gray-500 dark:bg-gray-900 dark:text-gray-400"
