@@ -87,7 +87,7 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
             setName(e.target.value)
             commitName(e.target.value)
           }}
-          className="font-semibold"
+          className="flex-1 font-semibold"
         />
         {!goal.is_active && <Badge tone="warning">לא פעיל</Badge>}
         <Toggle
@@ -95,17 +95,12 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
           onPressedChange={(pressed) => updateGoal.mutate({ id: goal.id, patch: { is_active: pressed } })}
           label={goal.is_active ? 'פעיל — לחיצה להשבתה' : 'לא פעיל — לחיצה להפעלה'}
         />
+      </div>
+
+      <div className="mt-2 flex items-center justify-end gap-2">
         {confirmingDelete ? (
           <>
-            <span className="text-xs text-gray-500 dark:text-gray-400">למחוק לצמיתות את ההיסטוריה?</span>
-            <Button
-              variant="danger"
-              title="כן, מחיקה"
-              aria-label="כן, מחיקה"
-              onClick={() => deleteGoal.mutate(goal.id)}
-            >
-              <TrashIcon />
-            </Button>
+            <span className="text-xs text-gray-500 dark:text-gray-400">למחוק לצמיתות?</span>
             <Button
               variant="ghost"
               title="ביטול"
@@ -113,6 +108,14 @@ export function GoalCard({ goal, contributions }: { goal: SavingsGoal; contribut
               onClick={() => setConfirmingDelete(false)}
             >
               <XIcon />
+            </Button>
+            <Button
+              variant="danger"
+              title="כן, מחיקה"
+              aria-label="כן, מחיקה"
+              onClick={() => deleteGoal.mutate(goal.id)}
+            >
+              <TrashIcon />
             </Button>
           </>
         ) : (

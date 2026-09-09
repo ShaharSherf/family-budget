@@ -24,9 +24,9 @@ export function IncomeExpenseNetChart({ data }: { data: ViewRow<'month_kpis'>[] 
             formatter={(value) => formatAxisILS(Number(value))}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Line type="monotone" dataKey="income" name="הכנסות" stroke={categorical[0]} strokeWidth={2} dot={{ r: 3 }} />
+          <Line type="monotone" dataKey="income" name="הכנסות" stroke={categorical[5]} strokeWidth={2} dot={{ r: 3 }} />
           <Line type="monotone" dataKey="expense" name="הוצאות" stroke={categorical[1]} strokeWidth={2} dot={{ r: 3 }} />
-          <Line type="monotone" dataKey="net" name="נטו" stroke={categorical[2]} strokeWidth={2} dot={{ r: 3 }} />
+          <Line type="monotone" dataKey="net" name="נטו" stroke={categorical[0]} strokeWidth={2} dot={{ r: 3 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>
