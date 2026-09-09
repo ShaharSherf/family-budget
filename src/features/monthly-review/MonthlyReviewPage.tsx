@@ -71,6 +71,8 @@ export function MonthlyReviewPage() {
         </>
       )}
 
+      {!isLoading && <PersonSummaryTable people={personTotals} />}
+
       <div className="grid gap-4 sm:grid-cols-2">
         <ChartCard
           title="תקציב מול הוצאה בפועל"
@@ -82,8 +84,6 @@ export function MonthlyReviewPage() {
           <CategoryBreakdownPieChart data={categoryActuals} />
         </ChartCard>
       </div>
-
-      {!isLoading && <PersonSummaryTable people={personTotals} />}
     </div>
   )
 }
