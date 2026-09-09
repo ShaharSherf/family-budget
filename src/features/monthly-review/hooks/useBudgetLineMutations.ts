@@ -60,7 +60,12 @@ export function useSetBudgetLinePayment(monthKey: string) {
     mutationFn: (vars: { budgetLineId: string; familyMemberId: string; paidAmount: number }) =>
       setBudgetLinePayment(vars.budgetLineId, vars.familyMemberId, vars.paidAmount),
     onSuccess: () => {
+      // A payment write also recomputes the line's actual_amount server-side
+      // (trg_sync_budget_line_actual), so everything derived from it needs
+      // refetching too, same as a direct actual_amount edit does.
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetLines(monthKey) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.monthKpis(monthKey) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.categoryActuals(monthKey) })
     },
   })
 }

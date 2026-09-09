@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from '@/lib/useDebouncedCallback'
 import { formatILS } from '@/lib/format'
 import { NumberInput, Input } from '@/components/ui/Input'
@@ -26,6 +26,13 @@ export function MonthlyTableRow({
   const [sharePct, setSharePct] = useState(row.share_pct.toString())
   const [notes, setNotes] = useState(row.notes ?? '')
 
+  // Unlike the other fields, this one can change from outside this row's own
+  // typing — filling in a per-person amount in "מי שילם" recomputes it
+  // server-side (see trg_sync_budget_line_actual), so it needs to pick that up.
+  useEffect(() => {
+    setActual(row.actual_amount?.toString() ?? '')
+  }, [row.actual_amount])
+
   const commit = useDebouncedCallback((patch: TablesUpdate<'budget_lines'>) => {
     update.mutate({ id: row.id, patch })
   }, 400)
@@ -50,11 +57,15 @@ export function MonthlyTableRow({
     <tr>
       <td className="px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100">{row.detail.name_he}</td>
       <td className="px-2 py-1.5">
+        <WhoPaidCell budgetLineId={row.id} payments={row.payments} monthKey={monthKey} readOnly={readOnly} />
+      </td>
+      <td className="px-2 py-1.5">
         <NumberInput
           className="w-24"
           value={actual}
           disabled={readOnly}
           placeholder="0"
+          title="מחושב אוטומטית מ׳מי שילם׳ אם מולא, אחרת ניתן להזין ידנית"
           onChange={(e) => {
             setActual(e.target.value)
             const n = Number(e.target.value)
@@ -100,9 +111,6 @@ export function MonthlyTableRow({
         }
       >
         {remainingDisplay !== null ? formatILS(remainingDisplay) : '—'}
-      </td>
-      <td className="px-2 py-1.5">
-        <WhoPaidCell budgetLineId={row.id} payments={row.payments} monthKey={monthKey} readOnly={readOnly} />
       </td>
       <td className="px-2 py-1.5">
         <Input

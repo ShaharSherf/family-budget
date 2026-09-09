@@ -6,9 +6,10 @@ import { NumberInput } from '@/components/ui/Input'
 import type { BudgetLinePayment } from '@/types/domain'
 
 /**
- * Per-person "who paid" breakdown — plain reference data for visibility
- * only (e.g. so the family can review who bought what), not used for any
- * automatic settle-up calculation.
+ * Per-person "who paid" breakdown. The line's actual_amount is recomputed
+ * server-side as the sum of these (trg_sync_budget_line_actual) whenever
+ * one changes — so filling this in is enough; the total needs no separate
+ * manual entry.
  */
 export function WhoPaidCell({
   budgetLineId,
