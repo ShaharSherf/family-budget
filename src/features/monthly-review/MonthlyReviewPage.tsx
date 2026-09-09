@@ -61,8 +61,6 @@ export function MonthlyReviewPage() {
 
       <BudgetActualSummary totals={totals} savings={savingsTotals} />
 
-      {!isLoading && <PersonSummaryTable people={personTotals} />}
-
       {isLoading ? (
         <p className="text-sm text-gray-400">טוען...</p>
       ) : (
@@ -84,6 +82,8 @@ export function MonthlyReviewPage() {
           <CategoryBreakdownPieChart data={categoryActuals} />
         </ChartCard>
       </div>
+
+      {!isLoading && <PersonSummaryTable people={personTotals} />}
     </div>
   )
 }
