@@ -4,13 +4,15 @@ import { currentMonthKey } from '@/lib/month'
 import { setLastViewedMonth } from '@/lib/lastViewedMonth'
 import { useBudgetLines } from './hooks/useBudgetLines'
 import { useMonth } from './hooks/useMonth'
-import { computeSavingsTotals, computeTotals, groupByCategory } from './utils'
+import { computePersonTotals, computeSavingsTotals, computeTotals, groupByCategory } from './utils'
 import { MonthPicker } from './components/MonthPicker'
 import { BudgetActualSummary } from './components/BudgetActualSummary'
 import { CloseMonthToggle } from './components/CloseMonthToggle'
 import { MonthAnnotations } from './components/MonthAnnotations'
 import { MonthlyTable } from './components/MonthlyTable'
+import { PersonSummaryTable } from './components/PersonSummaryTable'
 import { SavingsSection } from './components/SavingsSection'
+import { useFamilyMembers } from '@/features/family-members/useFamilyMembers'
 import { ChartCard } from '@/components/charts/ChartCard'
 import { BudgetVsActualBarChart } from '@/components/charts/BudgetVsActualBarChart'
 import { CategoryBreakdownPieChart } from '@/components/charts/CategoryBreakdownPieChart'
@@ -35,12 +37,14 @@ export function MonthlyReviewPage() {
   })
   const { data: savingsGoals = [] } = useSavingsGoals()
   const { data: monthContributions = [] } = useMonthlySavingsContributions(monthKey)
+  const { data: familyMembers = [] } = useFamilyMembers()
 
   const totals = useMemo(() => computeTotals(rows), [rows])
   const savingsTotals = useMemo(
     () => computeSavingsTotals(savingsGoals, monthContributions),
     [savingsGoals, monthContributions],
   )
+  const personTotals = useMemo(() => computePersonTotals(rows, familyMembers), [rows, familyMembers])
   const groups = useMemo(() => groupByCategory(rows), [rows])
   const incomeGroups = useMemo(() => groups.filter((g) => g.kind === 'income'), [groups])
   const expenseGroups = useMemo(() => groups.filter((g) => g.kind === 'expense'), [groups])
@@ -56,6 +60,8 @@ export function MonthlyReviewPage() {
       {month && <MonthAnnotations key={monthKey} monthKey={monthKey} notes={month.notes} readOnly={readOnly} />}
 
       <BudgetActualSummary totals={totals} savings={savingsTotals} />
+
+      {!isLoading && <PersonSummaryTable people={personTotals} />}
 
       {isLoading ? (
         <p className="text-sm text-gray-400">טוען...</p>

@@ -1,4 +1,5 @@
 import type { BudgetLineWithRelations } from '@/types/domain'
+import type { FamilyMember } from '@/lib/supabase/queries/familyMembers'
 import type { SavingsGoal } from '@/lib/supabase/queries/savingsGoals'
 import type { Tables } from '@/lib/supabase/database.types'
 
@@ -35,6 +36,35 @@ export function computeTotals(rows: BudgetLineWithRelations[]): MonthTotals {
     expenseTarget,
     leftoverActual: incomeActual - expenseActual,
   }
+}
+
+export interface PersonTotals {
+  memberId: string
+  name: string
+  earned: number
+  spent: number
+  net: number
+}
+
+/**
+ * Per-member earned/spent for the month, straight from each row's own
+ * per-person payment breakdown ("מי הרוויח"/"מי שילם") — not the row's
+ * family_actual_amount (that's this household's share only, e.g. split
+ * with an ex or roommate), and not a settle-up (who owes whom).
+ */
+export function computePersonTotals(rows: BudgetLineWithRelations[], members: FamilyMember[]): PersonTotals[] {
+  return members
+    .filter((m) => m.is_active)
+    .map((member) => {
+      let earned = 0
+      let spent = 0
+      for (const row of rows) {
+        const paid = row.payments.find((p) => p.family_member_id === member.id)?.paid_amount ?? 0
+        if (row.category.kind === 'income') earned += paid
+        else spent += paid
+      }
+      return { memberId: member.id, name: member.display_name, earned, spent, net: earned - spent }
+    })
 }
 
 export interface SavingsTotals {
