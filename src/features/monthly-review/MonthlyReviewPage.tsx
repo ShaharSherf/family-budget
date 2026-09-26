@@ -4,7 +4,7 @@ import { currentMonthKey } from '@/lib/month'
 import { setLastViewedMonth } from '@/lib/lastViewedMonth'
 import { useBudgetLines } from './hooks/useBudgetLines'
 import { useMonth } from './hooks/useMonth'
-import { computeAdamDebtByCategory, computePersonTotals, computeSavingsTotals, computeTotals, groupByCategory } from './utils'
+import { computeAdamDebtByDetail, computePersonTotals, computeSavingsTotals, computeTotals, groupByCategory } from './utils'
 import { MonthPicker } from './components/MonthPicker'
 import { BudgetActualSummary } from './components/BudgetActualSummary'
 import { CloseMonthToggle } from './components/CloseMonthToggle'
@@ -49,7 +49,7 @@ export function MonthlyReviewPage() {
   const groups = useMemo(() => groupByCategory(rows), [rows])
   const incomeGroups = useMemo(() => groups.filter((g) => g.kind === 'income'), [groups])
   const expenseGroups = useMemo(() => groups.filter((g) => g.kind === 'expense'), [groups])
-  const adamDebt = useMemo(() => computeAdamDebtByCategory(rows), [rows])
+  const adamDebt = useMemo(() => computeAdamDebtByDetail(rows), [rows])
   const readOnly = month?.is_closed ?? false
 
   return (

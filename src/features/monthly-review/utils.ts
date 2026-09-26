@@ -101,8 +101,9 @@ export interface CategoryGroup {
   targetTotal: number
 }
 
-export interface AdamDebtCategoryTotal {
-  categoryId: string
+export interface AdamDebtDetailTotal {
+  detailId: string
+  detailName: string
   categoryName: string
   owed: number
 }
@@ -111,25 +112,28 @@ export interface AdamDebtCategoryTotal {
  * "% עלינו" (share_pct) already says how much of each line is the
  * household's — the rest (actual_amount - family_actual_amount) is Adam's
  * share, whenever a line isn't fully ours (share_pct < 100). Nothing new to
- * enter; this just totals that remainder per category.
+ * enter; this just totals that remainder per sub-category (detail).
  */
-export function computeAdamDebtByCategory(rows: BudgetLineWithRelations[]): AdamDebtCategoryTotal[] {
-  const totals = new Map<string, AdamDebtCategoryTotal>()
+export function computeAdamDebtByDetail(rows: BudgetLineWithRelations[]): AdamDebtDetailTotal[] {
+  const totals = new Map<string, AdamDebtDetailTotal>()
 
   for (const row of rows) {
     if (row.share_pct >= 100 || row.actual_amount === null) continue
     const owed = row.actual_amount - (row.family_actual_amount ?? 0)
     if (owed <= 0) continue
 
-    let entry = totals.get(row.category_id)
+    let entry = totals.get(row.detail_id)
     if (!entry) {
-      entry = { categoryId: row.category_id, categoryName: row.category.name_he, owed: 0 }
-      totals.set(row.category_id, entry)
+      entry = { detailId: row.detail_id, detailName: row.detail.name_he, categoryName: row.category.name_he, owed: 0 }
+      totals.set(row.detail_id, entry)
     }
     entry.owed += owed
   }
 
-  return Array.from(totals.values()).sort((a, b) => a.categoryName.localeCompare(b.categoryName, 'he'))
+  return Array.from(totals.values()).sort((a, b) => {
+    const catCmp = a.categoryName.localeCompare(b.categoryName, 'he')
+    return catCmp !== 0 ? catCmp : a.detailName.localeCompare(b.detailName, 'he')
+  })
 }
 
 export function groupByCategory(rows: BudgetLineWithRelations[]): CategoryGroup[] {
