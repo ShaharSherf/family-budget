@@ -69,7 +69,7 @@ export function MonthlyReviewPage() {
         <>
           <MonthlyTable groups={incomeGroups} kind="income" monthKey={monthKey} readOnly={readOnly} />
           <SavingsSection monthKey={monthKey} readOnly={readOnly} />
-          <AdamDebtSection items={adamDebt} />
+          <AdamDebtSection items={adamDebt} monthKey={monthKey} />
           <MonthlyTable groups={expenseGroups} kind="expense" monthKey={monthKey} readOnly={readOnly} />
         </>
       )}

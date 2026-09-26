@@ -3,7 +3,8 @@ import { formatILS } from '@/lib/format'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { PlusIcon, TrashIcon } from '@/components/ui/icons'
-import { useCreateDetail, useUpdateDetail } from '@/features/categories/useCategories'
+import { useCreateDetail } from '@/features/categories/useCategories'
+import { useUpdateBudgetLine } from '../hooks/useBudgetLineMutations'
 import type { AdamDebtDetailTotal } from '../utils'
 
 interface CategoryGroup {
@@ -25,9 +26,9 @@ function groupByCategory(items: AdamDebtDetailTotal[]): CategoryGroup[] {
   return Array.from(groups.values())
 }
 
-export function AdamDebtSection({ items }: { items: AdamDebtDetailTotal[] }) {
+export function AdamDebtSection({ items, monthKey }: { items: AdamDebtDetailTotal[]; monthKey: string }) {
   const createDetail = useCreateDetail()
-  const updateDetail = useUpdateDetail()
+  const updateBudgetLine = useUpdateBudgetLine(monthKey)
   const [addingForCategoryId, setAddingForCategoryId] = useState<string | null>(null)
   const [newDetailName, setNewDetailName] = useState('')
 
@@ -67,9 +68,9 @@ export function AdamDebtSection({ items }: { items: AdamDebtDetailTotal[] }) {
                     <td className="py-1 text-end">
                       <Button
                         variant="ghost"
-                        title="הסרת תת-קטגוריה"
-                        aria-label="הסרת תת-קטגוריה"
-                        onClick={() => updateDetail.mutate({ id: item.detailId, patch: { is_active: false } })}
+                        title="הסרה מהחוב של אדם החודש (חוזר ל-100% עלינו)"
+                        aria-label="הסרה מהחוב של אדם החודש"
+                        onClick={() => updateBudgetLine.mutate({ id: item.budgetLineId, patch: { share_pct: 100 } })}
                       >
                         <TrashIcon />
                       </Button>
