@@ -69,12 +69,12 @@ export function MonthlyReviewPage() {
         <>
           <MonthlyTable groups={incomeGroups} kind="income" monthKey={monthKey} readOnly={readOnly} />
           <SavingsSection monthKey={monthKey} readOnly={readOnly} />
-          <AdamDebtSection items={adamDebt} monthKey={monthKey} />
           <MonthlyTable groups={expenseGroups} kind="expense" monthKey={monthKey} readOnly={readOnly} />
         </>
       )}
 
       {!isLoading && <PersonSummaryTable people={personTotals} />}
+      {!isLoading && <AdamDebtSection items={adamDebt} monthKey={monthKey} />}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <ChartCard
