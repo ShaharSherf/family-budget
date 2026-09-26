@@ -12,6 +12,7 @@ import { MonthAnnotations } from './components/MonthAnnotations'
 import { MonthlyTable } from './components/MonthlyTable'
 import { PersonSummaryTable } from './components/PersonSummaryTable'
 import { SavingsSection } from './components/SavingsSection'
+import { AdamDebtSection } from './components/AdamDebtSection'
 import { useFamilyMembers } from '@/features/family-members/useFamilyMembers'
 import { ChartCard } from '@/components/charts/ChartCard'
 import { BudgetVsActualBarChart } from '@/components/charts/BudgetVsActualBarChart'
@@ -67,6 +68,7 @@ export function MonthlyReviewPage() {
         <>
           <MonthlyTable groups={incomeGroups} kind="income" monthKey={monthKey} readOnly={readOnly} />
           <SavingsSection monthKey={monthKey} readOnly={readOnly} />
+          <AdamDebtSection monthKey={monthKey} readOnly={readOnly} />
           <MonthlyTable groups={expenseGroups} kind="expense" monthKey={monthKey} readOnly={readOnly} />
         </>
       )}
