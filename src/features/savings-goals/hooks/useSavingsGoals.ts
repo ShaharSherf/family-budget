@@ -10,6 +10,7 @@ import {
   upsertActualBalance,
   upsertContribution,
 } from '@/lib/supabase/queries/savingsGoals'
+import { getSavingsPageNotes, updateSavingsPageNotes } from '@/lib/supabase/queries/savingsPageNotes'
 import { queryKeys } from '@/lib/queryClient'
 import type { TablesInsert, TablesUpdate } from '@/lib/supabase/database.types'
 
@@ -79,5 +80,17 @@ export function useUpsertActualBalance() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.allSavingsContributions })
     },
+  })
+}
+
+export function useSavingsPageNotes() {
+  return useQuery({ queryKey: queryKeys.savingsPageNotes, queryFn: getSavingsPageNotes })
+}
+
+export function useUpdateSavingsPageNotes() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (notes: string | null) => updateSavingsPageNotes(notes),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.savingsPageNotes }),
   })
 }

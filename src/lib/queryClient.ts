@@ -23,4 +23,5 @@ export const queryKeys = {
   monthSavingsContributions: (monthKey: string) => ['savingsContributions', 'month', monthKey] as const,
   analytics: (fromMonth: string, toMonth: string) => ['analytics', fromMonth, toMonth] as const,
   calendarEvents: ['calendarEvents'] as const,
+  savingsPageNotes: ['savingsPageNotes'] as const,
 }

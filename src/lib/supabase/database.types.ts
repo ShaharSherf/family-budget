@@ -208,6 +208,12 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['allowed_signup_emails']['Insert']>
         Relationships: []
       }
+      savings_page_notes: {
+        Row: { id: boolean; notes: string | null; updated_at: string }
+        Insert: { id?: boolean; notes?: string | null; updated_at?: string }
+        Update: Partial<Database['public']['Tables']['savings_page_notes']['Insert']>
+        Relationships: []
+      }
       calendar_events: {
         Row: {
           id: string
