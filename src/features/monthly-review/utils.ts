@@ -104,6 +104,7 @@ export interface CategoryGroup {
 export interface AdamDebtDetailTotal {
   detailId: string
   detailName: string
+  categoryId: string
   categoryName: string
   owed: number
 }
@@ -124,7 +125,13 @@ export function computeAdamDebtByDetail(rows: BudgetLineWithRelations[]): AdamDe
 
     let entry = totals.get(row.detail_id)
     if (!entry) {
-      entry = { detailId: row.detail_id, detailName: row.detail.name_he, categoryName: row.category.name_he, owed: 0 }
+      entry = {
+        detailId: row.detail_id,
+        detailName: row.detail.name_he,
+        categoryId: row.category_id,
+        categoryName: row.category.name_he,
+        owed: 0,
+      }
       totals.set(row.detail_id, entry)
     }
     entry.owed += owed
