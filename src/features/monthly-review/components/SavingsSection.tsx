@@ -131,7 +131,7 @@ export function SavingsSection({ monthKey, readOnly }: { monthKey: string; readO
           </tr>
           {activeGoals.map((goal) => (
             <GoalRow
-              key={goal.id}
+              key={`${goal.id}-${monthKey}`}
               goal={goal}
               contribution={contributionByGoal.get(goal.id)}
               monthKey={monthKey}
