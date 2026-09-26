@@ -1,24 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { addAdamDebtItem, deleteAdamDebtItem, getAdamDebtItems } from '@/lib/supabase/queries/adamDebt'
+import { addAdamDebtShare, deleteAdamDebtShare, getAdamDebtShares } from '@/lib/supabase/queries/adamDebt'
 import { queryKeys } from '@/lib/queryClient'
 
-export function useAdamDebtItems(monthKey: string) {
-  return useQuery({ queryKey: queryKeys.adamDebtItems(monthKey), queryFn: () => getAdamDebtItems(monthKey) })
+export function useAdamDebtShares() {
+  return useQuery({ queryKey: queryKeys.adamDebtShares, queryFn: getAdamDebtShares })
 }
 
-export function useAddAdamDebtItem(monthKey: string) {
+export function useAddAdamDebtShare() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: { category: string; amount: number; notes?: string | null }) =>
-      addAdamDebtItem({ monthKey, ...input }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.adamDebtItems(monthKey) }),
+    mutationFn: (vars: { categoryId: string; percentage: number }) =>
+      addAdamDebtShare(vars.categoryId, vars.percentage),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.adamDebtShares }),
   })
 }
 
-export function useDeleteAdamDebtItem(monthKey: string) {
+export function useDeleteAdamDebtShare() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => deleteAdamDebtItem(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.adamDebtItems(monthKey) }),
+    mutationFn: (id: string) => deleteAdamDebtShare(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.adamDebtShares }),
   })
 }

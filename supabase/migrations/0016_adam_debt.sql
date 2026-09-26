@@ -1,18 +1,16 @@
--- Tracks how much Adam owes the household each month, broken down by
--- category (free text, not the budget categories table — this is a
--- receivable, not part of the income/expense budget).
+-- Adam owes the household a fixed percentage of certain budget categories
+-- every month (e.g. covers 50% of rent). The rule persists across months;
+-- the actual amount owed for a given month is computed client-side as
+-- percentage * that category's actual total for that month (from
+-- budget_lines) — nothing month-specific is stored here.
 
-create table public.adam_debt_items (
-  id         uuid primary key default gen_random_uuid(),
-  month_key  date not null,
-  category   text not null,
-  amount     numeric not null,
-  notes      text,
-  created_at timestamptz not null default now()
+create table public.adam_debt_shares (
+  id          uuid primary key default gen_random_uuid(),
+  category_id uuid not null unique references public.categories(id) on delete cascade,
+  percentage  numeric not null check (percentage > 0 and percentage <= 100),
+  created_at  timestamptz not null default now()
 );
 
-create index adam_debt_items_month_key_idx on public.adam_debt_items (month_key);
-
-alter table public.adam_debt_items enable row level security;
-create policy public_all on public.adam_debt_items for all using (true) with check (true);
-grant select, insert, update, delete on public.adam_debt_items to anon;
+alter table public.adam_debt_shares enable row level security;
+create policy public_all on public.adam_debt_shares for all using (true) with check (true);
+grant select, insert, update, delete on public.adam_debt_shares to anon;

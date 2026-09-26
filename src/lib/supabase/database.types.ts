@@ -214,24 +214,10 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['savings_page_notes']['Insert']>
         Relationships: []
       }
-      adam_debt_items: {
-        Row: {
-          id: string
-          month_key: string
-          category: string
-          amount: number
-          notes: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          month_key: string
-          category: string
-          amount: number
-          notes?: string | null
-          created_at?: string
-        }
-        Update: Partial<Database['public']['Tables']['adam_debt_items']['Insert']>
+      adam_debt_shares: {
+        Row: { id: string; category_id: string; percentage: number; created_at: string }
+        Insert: { id?: string; category_id: string; percentage: number; created_at?: string }
+        Update: Partial<Database['public']['Tables']['adam_debt_shares']['Insert']>
         Relationships: []
       }
       calendar_events: {

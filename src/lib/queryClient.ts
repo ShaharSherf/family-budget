@@ -24,5 +24,5 @@ export const queryKeys = {
   analytics: (fromMonth: string, toMonth: string) => ['analytics', fromMonth, toMonth] as const,
   calendarEvents: ['calendarEvents'] as const,
   savingsPageNotes: ['savingsPageNotes'] as const,
-  adamDebtItems: (monthKey: string) => ['adamDebtItems', monthKey] as const,
+  adamDebtShares: ['adamDebtShares'] as const,
 }

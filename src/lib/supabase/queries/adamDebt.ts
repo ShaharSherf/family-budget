@@ -1,40 +1,25 @@
 import { supabase } from '@/lib/supabase/client'
-import { toMonthDate } from '@/lib/month'
 import type { Tables } from '@/lib/supabase/database.types'
 
-export type AdamDebtItem = Tables<'adam_debt_items'>
+export type AdamDebtShare = Tables<'adam_debt_shares'>
 
-export async function getAdamDebtItems(monthKey: string): Promise<AdamDebtItem[]> {
-  const { data, error } = await supabase
-    .from('adam_debt_items')
-    .select('*')
-    .eq('month_key', toMonthDate(monthKey))
-    .order('created_at', { ascending: true })
+export async function getAdamDebtShares(): Promise<AdamDebtShare[]> {
+  const { data, error } = await supabase.from('adam_debt_shares').select('*')
   if (error) throw error
   return data
 }
 
-export async function addAdamDebtItem(input: {
-  monthKey: string
-  category: string
-  amount: number
-  notes?: string | null
-}): Promise<AdamDebtItem> {
+export async function addAdamDebtShare(categoryId: string, percentage: number): Promise<AdamDebtShare> {
   const { data, error } = await supabase
-    .from('adam_debt_items')
-    .insert({
-      month_key: toMonthDate(input.monthKey),
-      category: input.category,
-      amount: input.amount,
-      notes: input.notes ?? null,
-    })
+    .from('adam_debt_shares')
+    .insert({ category_id: categoryId, percentage })
     .select()
     .single()
   if (error) throw error
   return data
 }
 
-export async function deleteAdamDebtItem(id: string): Promise<void> {
-  const { error } = await supabase.from('adam_debt_items').delete().eq('id', id)
+export async function deleteAdamDebtShare(id: string): Promise<void> {
+  const { error } = await supabase.from('adam_debt_shares').delete().eq('id', id)
   if (error) throw error
 }
