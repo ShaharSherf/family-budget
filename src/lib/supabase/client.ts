@@ -10,15 +10,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-// PKCE (not the implicit flow) so the magic-link redirect carries `?code=`
-// in the query string rather than `#access_token=` in the hash — the app
-// uses HashRouter, which owns `location.hash` for routing, so auth must not
-// touch it. See src/router.tsx for the routing side of this.
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    flowType: 'pkce',
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-})
+// No login flow — every request goes through as anon; RLS grants anon full
+// access (supabase/migrations/0014_remove_login_open_access.sql).
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)

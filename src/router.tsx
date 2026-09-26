@@ -1,6 +1,5 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { ProtectedRoute } from '@/lib/auth/ProtectedRoute'
-import { LoginPage } from '@/features/auth/LoginPage'
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { AppShell } from '@/components/layout/AppShell'
 import { MonthlyReviewPage } from '@/features/monthly-review/MonthlyReviewPage'
 import { AnalyticsPage } from '@/features/analytics/AnalyticsPage'
 import { SavingsGoalsPage } from '@/features/savings-goals/SavingsGoalsPage'
@@ -13,8 +12,7 @@ import { getLastViewedMonth } from '@/lib/lastViewedMonth'
 export function AppRouter() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route element={<ProtectedRoute />}>
+      <Route element={<AppShell><Outlet /></AppShell>}>
         <Route
           path="/"
           element={<Navigate to={`/monthly/${getLastViewedMonth() ?? currentMonthKey()}`} replace />}

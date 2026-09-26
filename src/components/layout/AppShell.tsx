@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { supabase } from '@/lib/supabase/client'
 import { currentMonthKey } from '@/lib/month'
 import { getLastViewedMonth } from '@/lib/lastViewedMonth'
 import { setCatBackgroundEnabled, useCatBackgroundEnabled } from '@/lib/catBackgroundPreference'
 import { cn } from '@/lib/cn'
 import { Button } from '@/components/ui/Button'
-import { LogoutIcon } from '@/components/ui/icons'
 
 const STATIC_NAV_ITEMS = [
   { to: '/analytics', label: 'ניתוח ומגמות', match: '/analytics' },
@@ -70,14 +68,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               שינוי רקע
             </Button>
-            <button
-              onClick={() => supabase.auth.signOut()}
-              title="התנתקות"
-              aria-label="התנתקות"
-              className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-            >
-              <LogoutIcon className="rtl:scale-x-[-1]" />
-            </button>
           </div>
         </div>
       </header>

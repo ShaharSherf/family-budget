@@ -46,20 +46,6 @@ export function TrashIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-export function LogoutIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>
-      <path
-        d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3M9.5 9.5 12 7l-2.5-2.5M12 7H5"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 export function XIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...props}>
