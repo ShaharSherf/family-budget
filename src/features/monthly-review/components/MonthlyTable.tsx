@@ -18,7 +18,7 @@ function groupTotalColor(group: CategoryGroup): string {
 
 function getHeaders(kind: 'income' | 'expense'): string[] {
   const whoLabel = kind === 'income' ? 'מי הרוויח' : 'מי שילם'
-  return ['פירוט', whoLabel, 'בפועל', 'תקציב', '% עלינו', 'משפחתי', 'נותר', 'הערות', '']
+  return ['פירוט', whoLabel, 'בפועל', 'תקציב','משפחתי', 'נותר', 'הערות', '']
 }
 
 export function MonthlyTable({
@@ -55,7 +55,7 @@ export function MonthlyTable({
             {groups.map((group) => (
               <Fragment key={group.categoryId}>
                 <tr className="bg-gray-100 dark:bg-gray-800/60">
-                  <td colSpan={5} className="px-2 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  <td colSpan={4} className="px-2 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
                     {group.categoryName}
                   </td>
                   <td className={cn('px-2 py-1 text-sm font-semibold', groupTotalColor(group))}>

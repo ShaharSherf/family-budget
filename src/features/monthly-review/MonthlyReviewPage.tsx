@@ -4,7 +4,7 @@ import { currentMonthKey } from '@/lib/month'
 import { setLastViewedMonth } from '@/lib/lastViewedMonth'
 import { useBudgetLines } from './hooks/useBudgetLines'
 import { useMonth } from './hooks/useMonth'
-import { computeAdamDebtByDetail, computePersonTotals, computeSavingsTotals, computeTotals, groupByCategory } from './utils'
+import { computePersonTotals, computeSavingsTotals, computeTotals, groupByCategory } from './utils'
 import { MonthPicker } from './components/MonthPicker'
 import { BudgetActualSummary } from './components/BudgetActualSummary'
 import { CloseMonthToggle } from './components/CloseMonthToggle'
@@ -12,7 +12,6 @@ import { MonthAnnotations } from './components/MonthAnnotations'
 import { MonthlyTable } from './components/MonthlyTable'
 import { PersonSummaryTable } from './components/PersonSummaryTable'
 import { SavingsSection } from './components/SavingsSection'
-import { AdamDebtSection } from './components/AdamDebtSection'
 import { useFamilyMembers } from '@/features/family-members/useFamilyMembers'
 import { ChartCard } from '@/components/charts/ChartCard'
 import { BudgetVsActualBarChart } from '@/components/charts/BudgetVsActualBarChart'
@@ -49,7 +48,6 @@ export function MonthlyReviewPage() {
   const groups = useMemo(() => groupByCategory(rows), [rows])
   const incomeGroups = useMemo(() => groups.filter((g) => g.kind === 'income'), [groups])
   const expenseGroups = useMemo(() => groups.filter((g) => g.kind === 'expense'), [groups])
-  const adamDebt = useMemo(() => computeAdamDebtByDetail(rows), [rows])
   const readOnly = month?.is_closed ?? false
 
   return (
@@ -74,7 +72,6 @@ export function MonthlyReviewPage() {
       )}
 
       {!isLoading && <PersonSummaryTable people={personTotals} />}
-      {!isLoading && <AdamDebtSection items={adamDebt} monthKey={monthKey} />}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <ChartCard

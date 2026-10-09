@@ -23,7 +23,6 @@ export function MonthlyTableRow({
 
   const [actual, setActual] = useState(row.actual_amount?.toString() ?? '')
   const [target, setTarget] = useState(row.target_amount?.toString() ?? '')
-  const [sharePct, setSharePct] = useState(row.share_pct.toString())
   const [notes, setNotes] = useState(row.notes ?? '')
 
   // Unlike the other fields, this one can change from outside this row's own
@@ -83,18 +82,6 @@ export function MonthlyTableRow({
             setTarget(e.target.value)
             const n = Number(e.target.value)
             if (Number.isFinite(n)) commit({ target_amount: n })
-          }}
-        />
-      </td>
-      <td className="px-2 py-1.5">
-        <NumberInput
-          className="w-16"
-          value={sharePct}
-          disabled={readOnly}
-          onChange={(e) => {
-            setSharePct(e.target.value)
-            const n = Number(e.target.value)
-            if (Number.isFinite(n)) commit({ share_pct: n })
           }}
         />
       </td>
