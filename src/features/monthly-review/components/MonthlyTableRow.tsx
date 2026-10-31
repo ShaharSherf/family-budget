@@ -36,14 +36,16 @@ export function MonthlyTableRow({
     update.mutate({ id: row.id, patch })
   }, 400)
 
-  const hasComparison = row.target_amount !== null && row.family_actual_amount !== null
+  // An unset budget counts as 0, so any spending on it shows as over budget.
+  const budget = row.target_amount ?? 0
+  const hasComparison = row.family_actual_amount !== null
   const isIncome = row.category.kind === 'income'
 
   // Expenses: "remaining budget" (target - actual), red when over budget (negative).
   // Income: shown as a plain surplus/shortfall magnitude — never a signed negative
   // number, since "earned more than planned" is good news, not a deficit.
-  const remaining = hasComparison ? row.target_amount! - row.family_actual_amount! : null
-  const incomeDiff = hasComparison ? row.family_actual_amount! - row.target_amount! : null
+  const remaining = hasComparison ? budget - row.family_actual_amount! : null
+  const incomeDiff = hasComparison ? row.family_actual_amount! - budget : null
 
   const remainingDisplay = remaining === null ? null : isIncome ? Math.abs(incomeDiff!) : remaining
   const remainingIsWarning = remaining !== null && (isIncome ? incomeDiff! < 0 : remaining < 0)

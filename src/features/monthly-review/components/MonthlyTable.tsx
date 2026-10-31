@@ -8,7 +8,6 @@ import { AddLineDialog } from './AddLineDialog'
 import type { CategoryGroup } from '../utils'
 
 function groupTotalColor(group: CategoryGroup): string {
-  if (group.targetTotal <= 0) return 'text-gray-800 dark:text-gray-200'
   const isGood = group.kind === 'income' ? group.actualTotal > group.targetTotal : group.actualTotal < group.targetTotal
   const isWarning = group.kind === 'income' ? group.actualTotal < group.targetTotal : group.actualTotal > group.targetTotal
   if (isWarning) return 'text-red-600 dark:text-red-400'
