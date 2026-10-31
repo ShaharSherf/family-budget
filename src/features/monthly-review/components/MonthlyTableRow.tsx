@@ -85,9 +85,6 @@ export function MonthlyTableRow({
           }}
         />
       </td>
-      <td className="px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300">
-        {formatILS(row.family_actual_amount)}
-      </td>
       <td
         className={
           remainingIsWarning
